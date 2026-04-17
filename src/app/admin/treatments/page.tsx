@@ -1,0 +1,301 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { Plus, Edit2, Trash2, Tag, Save, X } from "lucide-react";
+import toast from "react-hot-toast";
+
+export default function AdminTreatmentsPage() {
+  const [treatments, setTreatments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<any>({});
+  const supabase = createClient();
+
+  useEffect(() => {
+    fetchTreatments();
+  }, []);
+
+  async function fetchTreatments() {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("treatments")
+      .select("*")
+      .order("sort_order", { ascending: true });
+    if (!error && data) setTreatments(data);
+    setLoading(false);
+  }
+
+  const handleSave = async (id: string | null) => {
+    const payload = {
+      name: editForm.name,
+      description: editForm.description,
+      price_range: editForm.price_range,
+      category: editForm.category,
+      is_active: editForm.is_active,
+      sort_order: editForm.sort_order || 0,
+    };
+
+    if (id === "new") {
+      const { error } = await supabase.from("treatments").insert([payload]);
+      if (error) {
+        toast.error("Failed to add treatment");
+        return;
+      }
+      toast.success("Treatment added");
+    } else {
+      const { error } = await supabase
+        .from("treatments")
+        .update(payload)
+        .eq("id", id as string);
+      if (error) {
+        toast.error("Failed to update treatment");
+        return;
+      }
+      toast.success("Treatment updated");
+    }
+
+    setIsEditing(null);
+    setEditForm({});
+    fetchTreatments();
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this treatment?")) return;
+    const { error } = await supabase.from("treatments").delete().eq("id", id);
+    if (!error) {
+      toast.success("Treatment deleted");
+      fetchTreatments();
+    }
+  };
+
+  const startEdit = (t: any) => {
+    setIsEditing(t.id);
+    setEditForm({ ...t });
+  };
+
+  const addNew = () => {
+    setIsEditing("new");
+    setEditForm({ is_active: true, sort_order: treatments.length + 1 });
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+            <Tag className="text-primary" size={32} />
+            Treatments & Pricing
+          </h1>
+          <p className="text-slate-400 mt-2">
+            Manage clinical procedures and standard price estimates
+          </p>
+        </div>
+        <button
+          onClick={addNew}
+          disabled={isEditing !== null}
+          className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-primary/20 transition-all disabled:opacity-50"
+        >
+          <Plus size={20} /> Add Treatment
+        </button>
+      </div>
+
+      <div className="bg-[#0A192F] rounded-3xl p-8 border border-white/5">
+        {loading ? (
+          <div className="text-center py-10 text-slate-400">
+            Loading treatments...
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {isEditing === "new" && (
+              <div className="bg-slate-800/50 p-6 rounded-2xl border border-primary/30 flex flex-col md:flex-row gap-4 items-start">
+                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    value={editForm.name || ""}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, name: e.target.value })
+                    }
+                    className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Category"
+                    value={editForm.category || ""}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, category: e.target.value })
+                    }
+                    className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Price Range (e.g. ₹3,000 - ₹6,000)"
+                    value={editForm.price_range || ""}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, price_range: e.target.value })
+                    }
+                    className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Sort Order"
+                    value={editForm.sort_order || ""}
+                    onChange={(e) =>
+                      setEditForm({
+                        ...editForm,
+                        sort_order: parseInt(e.target.value),
+                      })
+                    }
+                    className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                  />
+                  <textarea
+                    placeholder="Description"
+                    value={editForm.description || ""}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, description: e.target.value })
+                    }
+                    className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white md:col-span-2 h-20"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleSave("new")}
+                    className="p-3 bg-emerald-500/20 text-emerald-400 rounded-xl hover:bg-emerald-500/30"
+                  >
+                    <Save size={20} />
+                  </button>
+                  <button
+                    onClick={() => setIsEditing(null)}
+                    className="p-3 bg-slate-700/50 text-slate-400 rounded-xl hover:bg-slate-700"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {treatments.map((t) =>
+              isEditing === t.id ? (
+                <div
+                  key={t.id}
+                  className="bg-slate-800/50 p-6 rounded-2xl border border-primary/30 flex flex-col md:flex-row gap-4 items-start"
+                >
+                  <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      value={editForm.name || ""}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, name: e.target.value })
+                      }
+                      className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Category"
+                      value={editForm.category || ""}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, category: e.target.value })
+                      }
+                      className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Price Range"
+                      value={editForm.price_range || ""}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          price_range: e.target.value,
+                        })
+                      }
+                      className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Sort Order"
+                      value={editForm.sort_order || ""}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          sort_order: parseInt(e.target.value),
+                        })
+                      }
+                      className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                    />
+                    <textarea
+                      placeholder="Description"
+                      value={editForm.description || ""}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          description: e.target.value,
+                        })
+                      }
+                      className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white md:col-span-2 h-20"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleSave(t.id)}
+                      className="p-3 bg-emerald-500/20 text-emerald-400 rounded-xl hover:bg-emerald-500/30"
+                    >
+                      <Save size={20} />
+                    </button>
+                    <button
+                      onClick={() => setIsEditing(null)}
+                      className="p-3 bg-slate-700/50 text-slate-400 rounded-xl hover:bg-slate-700"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  key={t.id}
+                  className="bg-[#0B1B3D]/50 border border-white/5 p-6 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4 hover:border-primary/30 transition-colors"
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-1">
+                      <h3 className="font-bold text-white text-lg">{t.name}</h3>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/10 px-2 py-1 rounded-md">
+                        {t.category}
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-400 line-clamp-1 mb-2">
+                      {t.description}
+                    </p>
+                    <p className="text-emerald-400 font-bold">
+                      {t.price_range}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => startEdit(t)}
+                      className="p-3 rounded-xl bg-white/5 hover:bg-primary hover:text-white text-slate-400 transition-colors"
+                    >
+                      <Edit2 size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(t.id)}
+                      className="p-3 rounded-xl bg-white/5 hover:bg-red-500 hover:text-white text-slate-400 transition-colors"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              ),
+            )}
+
+            {treatments.length === 0 && isEditing !== "new" && (
+              <div className="text-center py-20 text-slate-500">
+                No treatments configured yet.
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
