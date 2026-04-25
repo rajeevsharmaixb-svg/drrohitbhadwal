@@ -44,13 +44,13 @@ export default function ServicesPage() {
   return (
     <main className="min-h-screen bg-white overflow-x-hidden">
       <Navbar />
-      
+
       {/* Cinematic Header */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden bg-slate-900">
-        <Image 
-          src="/images/services/consultation.webp" 
-          alt="Clinic atmosphere" 
-          fill 
+        <Image
+          src="/images/services/consultation.webp"
+          alt="Clinic atmosphere"
+          fill
           className="object-cover opacity-40 grayscale-[0.5]"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/60 to-slate-900" />
@@ -69,14 +69,14 @@ export default function ServicesPage() {
 
       {/* Main Grid Section */}
       <ServicesSection />
-      
+
       {/* Cinematic Detailed Sections */}
-      <section className="py-32 bg-slate-50">
+      <section className="py-32 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto space-y-48">
             {detailedServices.map((service, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`flex flex-col ${service.reverse ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-16 md:gap-24 anim-group`}
               >
                 <div className="flex-1 space-y-8 anim-item">
@@ -88,11 +88,11 @@ export default function ServicesPage() {
                     <h3 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 tracking-tight">
                       {service.title}
                     </h3>
-                    <p className="text-lg text-slate-600 leading-relaxed">
+                    <p className="text-lg text-black leading-relaxed">
                       {service.description}
                     </p>
                   </div>
-                  
+
                   <ul className="grid grid-cols-1 gap-4">
                     {service.features.map((feature, fIndex) => (
                       <li key={fIndex} className="flex items-center gap-4 group">
@@ -111,11 +111,11 @@ export default function ServicesPage() {
 
                 <div className="flex-1 w-full anim-item">
                   <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white group">
-                    <Image 
-                      src={service.image} 
-                      alt={service.title} 
-                      fill 
-                      className="object-cover transition-transform duration-700 group-hover:scale-110" 
+                    <Image
+                      src={service.image}
+                      alt={service.title}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent" />
                   </div>

@@ -83,7 +83,7 @@ export default function ServicesSection() {
   ];
 
   return (
-    <section id="services" className="py-24 bg-premium-gradient relative overflow-hidden">
+    <section id="services" className="py-24 bg-white relative overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-20 anim-group">
           <h2 className="text-sm font-bold text-primary tracking-[0.2em] uppercase mb-4 anim-item">Our Expertise</h2>
@@ -91,7 +91,7 @@ export default function ServicesSection() {
           <p className="text-xl font-medium text-primary mb-4 anim-item">
             Painless Treatment and Modern Equipment with Expert Care.
           </p>
-          <p className="text-lg text-slate-600 leading-relaxed anim-item">
+          <p className="text-lg text-black leading-relaxed anim-item">
             Experience the future of dentistry with our state-of-the-art diagnostic tools and patient-focused treatments.
           </p>
         </div>
@@ -101,19 +101,19 @@ export default function ServicesSection() {
             const Icon = service.icon;
 
             return (
-              <Card 
-                key={service.id} 
+              <Card
+                key={service.id}
                 className="group relative hover:-translate-y-2 transition-all duration-300 border-none shadow-sm hover:shadow-xl bg-white overflow-hidden anim-item"
               >
                 <CardContent className="p-0 flex flex-col h-full">
                   <div className="relative h-64 w-full overflow-hidden">
-                    <Image 
-                      src={service.image} 
-                      alt={service.name} 
-                      fill 
+                    <Image
+                      src={service.image}
+                      alt={service.name}
+                      fill
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent" />
+                    <div className="absolute inset-0 " />
                     <div className="absolute bottom-6 left-8 right-8">
                       <div className="flex items-center gap-3 mb-2">
                         <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
@@ -130,7 +130,7 @@ export default function ServicesSection() {
                   </div>
 
                   <div className="p-8 flex flex-col flex-grow">
-                    <p className="leading-relaxed mb-6 line-clamp-3 text-slate-600">
+                    <p className="leading-relaxed mb-6 line-clamp-3 text-black">
                       {service.description}
                     </p>
 
@@ -143,7 +143,7 @@ export default function ServicesSection() {
             )
           })}
         </div>
-        
+
         <div className="mt-16 text-center anim-group">
           <Link href="/services" className="anim-item inline-block">
             <Button size="lg" variant="outline" className="px-10 border-blue-200 hover:border-primary transition-all rounded-full">
