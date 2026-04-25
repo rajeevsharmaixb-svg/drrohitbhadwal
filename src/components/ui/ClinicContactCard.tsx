@@ -32,7 +32,7 @@ export default function ClinicContactCard() {
     <Card className="w-full max-w-lg border-border-color shadow-lg hover:shadow-xl transition-shadow bg-white overflow-hidden">
       <div className="bg-primary/5 border-b border-border-color p-6 text-center">
         <h2 className="text-2xl font-serif font-bold text-text-heading mb-1">
-          {settings.clinic_name || "Dr. Rohit's Dental Clinic"}
+          {settings.clinic_name || "Dr. Rohit Bhadwal's Dental & Implant Centre"}
         </h2>
         {settings.tagline && (
           <p className="text-sm font-medium text-primary uppercase tracking-wide">

@@ -4,7 +4,7 @@ import { Phone, MessageCircle } from 'lucide-react';
 
 export default function FloatingWhatsApp() {
   const WHATSAPP_NUMBER = '+919018464914';
-  const MESSAGE = encodeURIComponent("Hello Dr. Rohit, I'd like to inquire about a dental treatment.");
+  const MESSAGE = encodeURIComponent("Hello Dr. Rohit Bhadwal, I'd like to inquire about a dental treatment.");
   const URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${MESSAGE}`;
 
   return (

@@ -253,6 +253,7 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
                     <h5 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Patient Account</h5>
                     <p className="font-bold text-slate-800">{watch('patient_name')}</p>
                     <p className="text-sm text-slate-500">{watch('patient_phone')}</p>
+                    <p className="text-xs text-slate-400 mt-1">{watch('patient_address')}</p>
                   </div>
                   <div>
                     <h5 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Clinical Appointment</h5>
@@ -284,7 +285,7 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
                   <h5 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Payment Options</h5>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <a 
-                      href={`https://wa.me/919018464914?text=Hi, I would like to pay the consultation fee for my appointment on ${selectedDate}. Patient Name: ${watch('patient_name')}`}
+                      href={`https://wa.me/919018464914?text=Hi, I would like to pay the consultation fee for my appointment on ${selectedDate}. Patient Name: ${watch('patient_name')}. Address: ${watch('patient_address')}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 bg-[#25D366] hover:bg-[#20bd5a] text-white py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-bold transition-colors"
@@ -304,7 +305,7 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
             variant="outline" 
             onClick={() => step === 1 ? router.push('/book') : prevStep()} 
             disabled={isSubmitting}
-            className="rounded-xl flex-1 max-w-[120px] md:max-w-none text-sm md:text-base mr-4"
+            className="rounded-xl flex-1 max-w-[120px] md:max-w-none text-sm md:text-base mr-4 border-2 border-slate-300 hover:border-primary hover:text-primary transition-all shadow-sm"
           >
             <ChevronLeft size={20} className="mr-1 md:mr-2 shrink-0" /> Back
           </Button>
@@ -327,7 +328,7 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
       </Card>
       
       <p className="text-center text-slate-400 text-[10px] mt-8">
-        By continuing, you agree to Dr Rohit Dental Clinic's digital privacy policy and clinical attendance protocols.
+        By continuing, you agree to Dr. Rohit Bhadwal&apos;s digital privacy policy and clinical attendance protocols.
       </p>
     </div>
   );

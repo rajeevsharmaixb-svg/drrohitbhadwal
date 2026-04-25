@@ -1,6 +1,10 @@
 'use client';
 
-import SmileScroll from '@/components/SmileScroll';
+import dynamic from 'next/dynamic';
+const StickyHeroSequence = dynamic(
+  () => import('@/components/home/StickyHeroSequence'),
+  { ssr: false }
+);
 import Navbar from "@/components/layout/Navbar";
 import AboutSection from "@/components/home/AboutSection";
 import ServicesSection from "@/components/home/ServicesSection";
@@ -16,14 +20,14 @@ export default function Home() {
   return (
     <main className="min-h-screen relative overflow-x-hidden">
       <Navbar />
-      <SmileScroll />
-      <TestimonialsCarousel />
+      <StickyHeroSequence />
       <AboutSection />
       <ServicesSection />
       <DoctorsSection />
       <FAQSection />
       <CTASection />
-      <ContactSection />
+      <ContactSection hideForm={true} />
+      <TestimonialsCarousel />
       <Footer />
 
       {/* Interactive Elements */}
@@ -31,4 +35,3 @@ export default function Home() {
     </main>
   );
 }
-

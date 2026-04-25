@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -41,11 +42,11 @@ function LoginForm() {
 
   return (
     <Card className="border-none shadow-2xl rounded-3xl overflow-hidden">
-      <CardHeader className="bg-slate-900 text-white p-8">
-        <CardTitle className="text-xl flex items-center gap-2">
-          <LogIn size={20} className="text-blue-400" /> Member Login
+      <CardHeader className="bg-slate-50 border-b border-slate-100 p-8">
+        <CardTitle className="text-xl flex items-center gap-2 text-slate-900">
+          <LogIn size={20} className="text-primary" /> Member Login
         </CardTitle>
-        <CardDescription className="text-slate-400">
+        <CardDescription className="text-slate-500">
           Access your medical history and clinical appointments.
         </CardDescription>
       </CardHeader>
@@ -119,11 +120,16 @@ export default function LoginPage() {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <div className="bg-primary p-2 rounded-full text-white shadow-lg">
-              <Stethoscope size={28} />
+          <Link href="/" className="inline-flex items-center gap-3 mb-4">
+            <div className="rounded-2xl overflow-hidden shadow-xl border-4 border-white">
+              <Image 
+                src="/images/logo.jpg" 
+                alt="Logo" 
+                width={56} 
+                height={56} 
+              />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">Dr Rohit Dental Clinic</h1>
+            <h1 className="text-2xl font-bold text-slate-900">Dr. Rohit Bhadwal&apos;s</h1>
           </Link>
           <p className="text-slate-500 font-medium">Digital Patient Portal Access</p>
         </div>

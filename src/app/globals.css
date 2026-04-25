@@ -28,7 +28,7 @@
   --color-input: #f1f5f9;
   --color-ring: #0077B6;
 
-  --color-bg-dark: #f2f2f2;
+  --color-bg-dark: #0B1B3D;
   --color-bg-gray: #ffff3d;
   --color-text-main: #334155;
   --color-text-heading: #0f172a;
@@ -56,9 +56,13 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    @apply font-sans;
+    font-family: var(--font-sans);
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+.bg-premium-gradient {
+  background: linear-gradient(135deg, #e0f2fe 0%, #ffedd5 100%);
 }
 
 /* Animated counter keyframes */
@@ -92,4 +96,184 @@
 
 .animate-slide-in-right {
   animation: slideInFromRight 0.5s ease-out both;
+}
+
+/* --- PRD Feature 2: Scroll-Driven Icon Animation Classes --- */
+
+/* Base element */
+.anim-item {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 600ms ease-out, transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform, opacity;
+}
+
+/* Visible trigger */
+.anim-item.is-visible,
+.anim-icon.is-visible,
+.anim-heading.is-visible,
+.anim-card.is-visible {
+  opacity: 1;
+  filter: blur(0px);
+}
+
+.anim-item.is-visible {
+  transform: translateY(0px) scale(1);
+}
+
+/* Specific variants */
+.anim-icon {
+  opacity: 0;
+  transform: translateY(28px) scale(0.88);
+  filter: blur(4px);
+  transition: opacity 600ms ease-out, transform 600ms cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 500ms ease-out;
+}
+.anim-icon.is-visible {
+  transform: translateY(0px) scale(1);
+}
+
+.anim-heading {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 600ms ease-out, transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.anim-heading.is-visible {
+  transform: translateX(0px);
+}
+
+.anim-card {
+  opacity: 0;
+  transform: translateY(28px) scale(0.96);
+  transition: opacity 600ms ease-out, transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.anim-card.is-visible {
+  transform: translateY(0px) scale(1);
+}
+
+/* Fade out on exit animation settings */
+.fade-out-on-exit {
+  transition: opacity 400ms ease-in, transform 400ms ease-in !important;
+}
+
+/* Accessibility: Reduced Motion Fallback */
+@media (prefers-reduced-motion: reduce) {
+  .anim-item, .anim-icon, .anim-heading, .anim-card {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    filter: none !important;
+  }
+  .sticky-container {
+    height: auto !important;
+  }
+  .sticky-hero {
+    position: relative !important;
+  }
+  .fade-out-on-exit {
+    transition: none !important;
+  }
+}
+
+/* Premium Gallery Section */
+.gallery-section {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background-color: #f8fafc; /* slate-50 */
+  z-index: 1;
+}
+
+/* Fixed PNG Background with Metallic Shine */
+.gallery-bg {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vw;
+  height: 100vh;
+  background-image: url('/images/tools/d519d172-f272-45d4-a999-9c54783eb8b8.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+}
+
+.gallery-bg.opacity-15 {
+  opacity: 0.15;
+}
+
+.gallery-bg.opacity-0 {
+  opacity: 0;
+}
+
+/* Metallic Shine Overlay */
+.gallery-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: metallicShine 3s infinite linear;
+  pointer-events: none;
+}
+
+@keyframes metallicShine {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.gallery-content {
+  position: relative;
+  z-index: 10;
+}
+
+.gallery-title {
+  font-size: 3rem;
+  font-weight: 800;
+  text-align: center;
+  color: #0f172a;
+  margin-bottom: 1rem;
+  letter-spacing: -0.025em;
+  font-family: var(--font-serif);
+}
+
+.gallery-subtitle {
+  color: #64748b;
+  font-size: 1.125rem;
+}
+
+/* Masonry Layout */
+.masonry-grid {
+  column-count: 1;
+  column-gap: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .masonry-grid { column-count: 2; }
+}
+
+@media (min-width: 1024px) {
+  .masonry-grid { column-count: 3; }
+}
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 1.5rem;
+  transform: translateZ(0);
+}
+
+/* Glassmorphism for clinic tour cards */
+.tour-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }

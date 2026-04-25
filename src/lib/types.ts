@@ -46,6 +46,7 @@ export type Database = {
           message: string | null
           notes: string | null
           package_id: string | null
+          patient_address: string | null
           patient_email: string | null
           patient_id: string | null
           patient_name: string
@@ -64,6 +65,7 @@ export type Database = {
           message?: string | null
           notes?: string | null
           package_id?: string | null
+          patient_address?: string | null
           patient_email?: string | null
           patient_id?: string | null
           patient_name: string
@@ -82,6 +84,7 @@ export type Database = {
           message?: string | null
           notes?: string | null
           package_id?: string | null
+          patient_address?: string | null
           patient_email?: string | null
           patient_id?: string | null
           patient_name?: string

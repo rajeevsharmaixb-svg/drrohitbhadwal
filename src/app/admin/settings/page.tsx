@@ -13,7 +13,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/Input';
 import { Skeleton } from '@/components/ui/Skeleton';
 import toast from 'react-hot-toast';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const TABS = [
   { id: 'brand', label: 'Clinical Identity', icon: Building2 },
@@ -139,19 +138,15 @@ export default function AdminSettingsPage() {
         ))}
       </div>
 
-      <AnimatePresence mode="wait">
+      <div className="mt-8">
         {activeTab === 'brand' && (
-            <motion.div
-                key="brand"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+            <div
+                className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in slide-in-from-right-4 duration-500"
             >
                 <Card className="border-none shadow-xl rounded-[2.5rem] bg-white overflow-hidden">
-                    <CardHeader className="bg-slate-900 text-white p-8">
-                        <CardTitle className="text-lg">General Brand Identity</CardTitle>
-                        <CardDescription className="text-slate-400">Essential clinic identifiers visible to patients.</CardDescription>
+                    <CardHeader className="bg-slate-50 border-b border-slate-100 p-8">
+                        <CardTitle className="text-lg text-slate-900">General Brand Identity</CardTitle>
+                        <CardDescription className="text-slate-500">Essential clinic identifiers visible to patients.</CardDescription>
                     </CardHeader>
                     <CardContent className="p-8 space-y-6">
                         <div className="space-y-2">
@@ -247,21 +242,17 @@ export default function AdminSettingsPage() {
                         </div>
                     </CardContent>
                 </Card>
-            </motion.div>
+            </div>
         )}
 
         {activeTab === 'operations' && (
-            <motion.div
-                key="operations"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-8"
+            <div
+                className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500"
             >
                 <Card className="border-none shadow-xl rounded-[2.5rem] bg-white overflow-hidden">
-                    <CardHeader className="bg-slate-900 text-white p-8">
-                        <CardTitle className="text-lg">Clinical Operational Hours</CardTitle>
-                        <CardDescription className="text-slate-400">Define weekly clinical slots and break period intervals.</CardDescription>
+                    <CardHeader className="bg-slate-50 border-b border-slate-100 p-8">
+                        <CardTitle className="text-lg text-slate-900">Clinical Operational Hours</CardTitle>
+                        <CardDescription className="text-slate-500">Define weekly clinical slots and break period intervals.</CardDescription>
                     </CardHeader>
                     <CardContent className="p-0">
                          <div className="divide-y divide-slate-100">
@@ -326,22 +317,18 @@ export default function AdminSettingsPage() {
                          </div>
                     </CardContent>
                 </Card>
-            </motion.div>
+            </div>
         )}
 
         {activeTab === 'policies' && (
-            <motion.div
-                key="policies"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-8"
+            <div
+                className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500"
             >
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <Card className="border-none shadow-xl rounded-[2.5rem] bg-white overflow-hidden">
-                        <CardHeader className="bg-slate-900 text-white p-8">
-                            <CardTitle className="text-lg">Financial Protocol</CardTitle>
-                            <CardDescription className="text-slate-400">Configure consultation fees and billing parameters.</CardDescription>
+                        <CardHeader className="bg-slate-50 border-b border-slate-100 p-8">
+                            <CardTitle className="text-lg text-slate-900">Financial Protocol</CardTitle>
+                            <CardDescription className="text-slate-500">Configure consultation fees and billing parameters.</CardDescription>
                         </CardHeader>
                         <CardContent className="p-8">
                              <div className="space-y-2">
@@ -387,9 +374,9 @@ export default function AdminSettingsPage() {
                         </CardContent>
                     </Card>
                 </div>
-            </motion.div>
+            </div>
         )}
-      </AnimatePresence>
+      </div>
 
       <div className="p-8 rounded-[3rem] bg-amber-50/50 border border-amber-100 border-dashed flex items-center justify-between">
           <div className="flex items-center gap-4">

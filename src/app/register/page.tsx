@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -95,21 +96,26 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 py-20">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <div className="bg-primary p-2 rounded-full text-white shadow-lg">
-              <Stethoscope size={28} />
+          <Link href="/" className="inline-flex items-center gap-3 mb-4">
+            <div className="rounded-2xl overflow-hidden shadow-xl border-4 border-white">
+              <Image 
+                src="/images/logo.jpg" 
+                alt="Logo" 
+                width={56} 
+                height={56} 
+              />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">Dr Rohit Dental Clinic</h1>
+            <h1 className="text-2xl font-bold text-slate-900">Dr. Rohit Bhadwal&apos;s</h1>
           </Link>
           <p className="text-slate-500 font-medium">Create Secure Patient Account</p>
         </div>
 
         <Card className="border-none shadow-2xl rounded-3xl overflow-hidden">
-          <CardHeader className="bg-slate-900 text-white p-8">
-            <CardTitle className="text-xl flex items-center gap-2">
-              <UserPlus size={20} className="text-emerald-400" /> Sign Up
+          <CardHeader className="bg-slate-50 border-b border-slate-100 p-8">
+            <CardTitle className="text-xl flex items-center gap-2 text-slate-900">
+              <UserPlus size={20} className="text-primary" /> Sign Up
             </CardTitle>
-            <CardDescription className="text-slate-400">
+            <CardDescription className="text-slate-500">
               Register to track treatment plans and book priority slots.
             </CardDescription>
           </CardHeader>

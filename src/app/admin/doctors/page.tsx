@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
 import toast from 'react-hot-toast';
-import { motion, AnimatePresence } from 'framer-motion';
+import { format } from 'date-fns';
 
 export default function AdminDoctorsPage() {
   const supabase = createClient();
@@ -36,6 +36,8 @@ export default function AdminDoctorsPage() {
     experience_years: '',
     short_bio: '',
     photo_url: '',
+    availability_hours: '',
+    rating: '5.0',
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -70,6 +72,8 @@ export default function AdminDoctorsPage() {
         experience_years: String(doctor.experience_years),
         short_bio: doctor.short_bio || '',
         photo_url: doctor.photo_url || '',
+        availability_hours: doctor.availability_hours || '',
+        rating: String(doctor.rating || '5.0'),
       });
       setImagePreview(doctor.photo_url);
     } else {
@@ -82,6 +86,8 @@ export default function AdminDoctorsPage() {
         experience_years: '',
         short_bio: '',
         photo_url: '',
+        availability_hours: '',
+        rating: '5.0',
       });
       setImagePreview(null);
     }
@@ -128,7 +134,8 @@ export default function AdminDoctorsPage() {
 
       const payload = {
         ...formData,
-        experience_years: parseInt(formData.experience_years),
+        experience_years: parseInt(formData.experience_years) || 0,
+        rating: parseFloat(formData.rating) || 5.0,
         photo_url,
       };
 
@@ -224,10 +231,10 @@ export default function AdminDoctorsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-center pt-8">
         {filtered.length === 0 ? (
-          <div className="col-span-full py-32 flex flex-col items-center justify-center text-slate-400 bg-white/50 border border-dashed border-slate-200 rounded-[3rem]">
+          <div className="col-span-full py-32 flex flex-col items-center justify-center text-slate-400 bg-white border border-dashed border-slate-200 rounded-[3rem] shadow-inner font-medium">
             <User size={64} className="opacity-10 mb-4" />
             <p className="text-lg font-bold">No clinical profiles found.</p>
-            <Button variant="ghost" onClick={() => setSearch('')} className="mt-4 text-primary font-black uppercase text-[10px] tracking-widest hover:bg-white">Clear Selection</Button>
+            <Button variant="ghost" onClick={() => setSearch('')} className="mt-4 text-primary font-black uppercase text-[10px] tracking-widest hover:bg-slate-50">Clear Selection</Button>
           </div>
         ) : (
           filtered.map((doc, idx) => {
@@ -235,11 +242,8 @@ export default function AdminDoctorsPage() {
             const displayPhoto = doc.photo_url || localFallbacks[idx % localFallbacks.length];
             
             return (
-            <motion.div
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: idx * 0.1 }}
+            <div
+              className="animate-in fade-in scale-95 duration-500"
               key={doc.id}
             >
               <Card className="group border-none shadow-xl hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 rounded-[3rem] overflow-hidden bg-white hover:-translate-y-2">
@@ -276,8 +280,13 @@ export default function AdminDoctorsPage() {
 
                   <div className="p-8 space-y-4 flex-1">
                     <div>
-                      <Badge variant="info" className="mb-3 text-[9px]">{doc.specialization}</Badge>
-                      <h3 className="text-xl font-black text-slate-900 group-hover:text-primary transition-colors">Dr. {doc.full_name}</h3>
+                      <div className="flex justify-between items-start mb-3">
+                        <Badge variant="info" className="text-[9px]">{doc.specialization}</Badge>
+                        <div className="flex items-center gap-1 text-amber-500 font-bold text-xs bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">
+                          ★ {doc.rating || '5.0'}
+                        </div>
+                      </div>
+                      <h3 className="text-xl font-black text-slate-900 group-hover:text-primary transition-colors">{doc.full_name}</h3>
                       <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.15em] mt-1">{doc.designation}</p>
                     </div>
 
@@ -298,7 +307,7 @@ export default function AdminDoctorsPage() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
             );
           })
         )}
@@ -380,6 +389,30 @@ export default function AdminDoctorsPage() {
                 value={formData.experience_years} 
                 onChange={(e) => setFormData({...formData, experience_years: e.target.value})} 
                 placeholder="e.g. 15" 
+                required 
+                className="rounded-2xl h-12"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-slate-700 ml-1">Clinician Rating (0-5)</label>
+              <Input 
+                type="number" 
+                step="0.1"
+                min="0"
+                max="5"
+                value={formData.rating} 
+                onChange={(e) => setFormData({...formData, rating: e.target.value})} 
+                placeholder="e.g. 5.0" 
+                required 
+                className="rounded-2xl h-12"
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm font-bold text-slate-700 ml-1">Availability Hours</label>
+              <Input 
+                value={formData.availability_hours} 
+                onChange={(e) => setFormData({...formData, availability_hours: e.target.value})} 
+                placeholder="e.g. 10:00 AM - 2:00 PM, 4:30 PM - 7:30 PM" 
                 required 
                 className="rounded-2xl h-12"
               />

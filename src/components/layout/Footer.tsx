@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 
 export default function Footer() {
@@ -9,14 +10,14 @@ export default function Footer() {
         {/* Brand */}
         <div>
           <div className="flex items-center gap-2 mb-4">
-             <div className="bg-gradient-to-br from-primary to-accent p-1.5 rounded-xl shadow-sm text-white inline-block">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s-4-1-4-5V7c0-2.2 1.8-4 4-4s4 1.8 4 4v10c0 4-4 5-4 5z"/>
-                <path d="M8 12h8"/>
-                <path d="M12 8v8"/>
-              </svg>
-            </div>
-            <h2 className="text-2xl font-serif font-[800] text-white">Dr. Rohit&apos;s<br/>Dental & Implant Centre</h2>
+            <Image
+              src="/images/logo.jpg"
+              alt="Dr. Rohit's Dental & Implant Centre"
+              width={40}
+              height={40}
+              className="rounded-xl shadow-sm"
+            />
+            <h2 className="text-xl font-serif font-[800] text-white">Dr Rohit Dental Clinic<br/>Braces & Implant Centre</h2>
           </div>
           <p className="text-slate-400 text-sm mb-6 max-w-xs">
             Your smile is our priority. We provide world-class dental care in a comfortable, modern environment in Kathua, J&K.
@@ -28,7 +29,7 @@ export default function Footer() {
           <h3 className="text-lg font-semibold mb-4 border-b border-gray-700 pb-2 inline-block">Quick Links</h3>
           <ul className="flex flex-col gap-3">
             <li><Link href="/" className="text-slate-400 hover:text-white transition-colors">Home</Link></li>
-            <li><Link href="/about" className="text-slate-400 hover:text-white transition-colors">About Dr. Rohit</Link></li>
+            <li><Link href="/about" className="text-slate-400 hover:text-white transition-colors">About Dr. Rohit Bhadwal</Link></li>
             <li><Link href="/services" className="text-slate-400 hover:text-white transition-colors">Treatments</Link></li>
             <li><Link href="/gallery" className="text-slate-400 hover:text-white transition-colors">Smile Gallery</Link></li>
             <li><Link href="/contact" className="text-slate-400 hover:text-white transition-colors">Contact Us</Link></li>
@@ -80,7 +81,7 @@ export default function Footer() {
       </div>
 
       <div className="container mx-auto px-4 pt-8 border-t border-slate-800 text-center text-slate-500 text-sm">
-        <p>&copy; {new Date().getFullYear()} Dr. Rohit&apos;s Dental & Implant Centre. All Rights Reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Dr Rohit Dental Clinic Braces & Implant Centre. All Rights Reserved.</p>
       </div>
     </footer>
   );

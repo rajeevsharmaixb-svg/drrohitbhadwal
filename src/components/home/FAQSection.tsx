@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { motion, AnimatePresence } from 'framer-motion';
-import { HelpCircle, ChevronDown, MessageCircle, Calendar, Phone } from 'lucide-react';
+import { HelpCircle, ChevronDown, Calendar, Phone } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '../ui/Button';
 
@@ -41,9 +40,9 @@ export default function FAQSection() {
   };
 
   return (
-    <section id="faq" className="py-24 bg-slate-50">
+    <section id="faq" className="py-24 bg-premium-gradient">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-16 anim-heading fade-out-on-exit">
           <h2 className="text-sm font-bold text-primary tracking-[0.2em] uppercase mb-4">Common Questions</h2>
           <h3 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 mb-6 tracking-tight">
             Frequently Asked Questions
@@ -67,15 +66,11 @@ export default function FAQSection() {
               <p className="text-slate-400 text-sm mt-1">Contact us directly for any questions.</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-4 anim-group">
               {faqs.map((faq, index) => (
-                <motion.div
+                <div
                   key={faq.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                  className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow anim-card"
                 >
                   <button
                     onClick={() => toggle(index)}
@@ -99,41 +94,37 @@ export default function FAQSection() {
                     />
                   </button>
 
-                  <AnimatePresence>
-                    {activeIndex === index && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-6 pb-6 ml-14">
-                          <p className="text-slate-600 leading-relaxed mb-4">{faq.answer}</p>
-                          
-                          {faq.action && faq.action !== 'none' && (
-                            <div className="flex gap-3">
-                              {faq.action === 'book' && (
-                                <Link href="/book">
-                                  <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs h-9 px-4 rounded-xl">
-                                    <Calendar size={14} className="mr-1.5" /> Book Appointment
-                                  </Button>
-                                </Link>
-                              )}
-                              {faq.action === 'whatsapp' && (
-                                <a href="https://wa.me/919018464914" target="_blank" rel="noreferrer">
-                                  <Button size="sm" className="bg-green-500 hover:bg-green-600 text-white text-xs h-9 px-4 rounded-xl">
-                                    <Phone size={14} className="mr-1.5" /> WhatsApp
-                                  </Button>
-                                </a>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
+                  <div 
+                    className={`grid transition-all duration-300 ease-in-out ${
+                      activeIndex === index ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="px-6 pb-6 ml-14">
+                        <p className="text-slate-600 leading-relaxed mb-4">{faq.answer}</p>
+                        
+                        {faq.action && faq.action !== 'none' && (
+                          <div className="flex gap-3">
+                            {faq.action === 'book' && (
+                              <Link href="/book">
+                                <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs h-9 px-4 rounded-xl">
+                                  <Calendar size={14} className="mr-1.5" /> Book Appointment
+                                </Button>
+                              </Link>
+                            )}
+                            {faq.action === 'whatsapp' && (
+                              <a href="https://wa.me/919018464914" target="_blank" rel="noreferrer">
+                                <Button size="sm" className="bg-green-500 hover:bg-green-600 text-white text-xs h-9 px-4 rounded-xl">
+                                  <Phone size={14} className="mr-1.5" /> WhatsApp
+                                </Button>
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           )}

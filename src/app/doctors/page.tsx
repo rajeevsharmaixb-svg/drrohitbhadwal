@@ -3,11 +3,10 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { 
-  Stethoscope, Star, GraduationCap, Briefcase, 
+  Stethoscope, Star, Briefcase, 
   ChevronRight, Calendar, User, Search
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { motion } from 'framer-motion';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
@@ -33,8 +32,10 @@ export default function DoctorsPage() {
   }, [supabase]);
 
   const filtered = doctors.filter(d => 
-    d.full_name.toLowerCase().includes(search.toLowerCase()) ||
-    d.specialization.toLowerCase().includes(search.toLowerCase())
+    (d.full_name?.toLowerCase() || '').includes(search.toLowerCase()) ||
+    (d.specialization?.toLowerCase() || '').includes(search.toLowerCase()) ||
+    (d.short_bio?.toLowerCase() || '').includes(search.toLowerCase()) ||
+    (d.designation?.toLowerCase() || '').includes(search.toLowerCase())
   );
 
   if (loading) {
@@ -56,31 +57,17 @@ export default function DoctorsPage() {
       
       {/* Hero Header */}
       <section className="bg-[#0F766E] pt-32 pb-20 px-4">
-        <div className="container mx-auto text-center space-y-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/10"
-          >
+        <div className="container mx-auto text-center space-y-6 anim-heading fade-out-on-exit">
+          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
             <Stethoscope size={16} className="text-[#14B8A6]" />
             <span className="text-white text-[10px] font-black uppercase tracking-[0.2em]">Our Clinical Experts</span>
-          </motion.div>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-4xl md:text-7xl font-serif text-white leading-tight"
-          >
+          </div>
+          <h1 className="text-4xl md:text-7xl font-serif text-white leading-tight">
             Meet the Specialists at <br />
             <span className="text-[#14B8A6]">Rohit Dental Clinic</span>
-          </motion.h1>
+          </h1>
           
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="max-w-2xl mx-auto relative group mt-12"
-          >
+          <div className="max-w-2xl mx-auto relative group mt-12">
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#14B8A6] transition-colors" size={24} />
             <input 
               value={search}
@@ -88,25 +75,22 @@ export default function DoctorsPage() {
               placeholder="Search by name or specialization..."
               className="w-full h-16 pl-16 pr-8 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/10 text-white placeholder:text-white/40 focus:ring-4 focus:ring-[#14B8A6]/20 outline-none transition-all text-lg"
             />
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Team Grid */}
       <section className="py-24 container mx-auto px-4">
-        <div className="grid grid-cols-1 gap-12">
+        <div className="grid grid-cols-1 gap-12 anim-group">
           {filtered.length === 0 ? (
-            <div className="text-center py-24 bg-white rounded-[3rem] border-2 border-dashed border-slate-200">
+            <div className="text-center py-24 bg-white rounded-[3rem] border-2 border-dashed border-slate-200 anim-item">
                <p className="text-slate-400 font-bold">No specialists found matching your search.</p>
             </div>
           ) : (
             filtered.map((doc, i) => (
-              <motion.div 
+              <div 
                 key={doc.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-[3rem] shadow-2xl shadow-slate-200/50 overflow-hidden border border-slate-100 group hover:shadow-primary/5 transition-all duration-700"
+                className="bg-white rounded-[3rem] shadow-2xl shadow-slate-200/50 overflow-hidden border border-slate-100 group hover:shadow-primary/5 transition-all duration-700 anim-card"
               >
                 <div className="flex flex-col lg:flex-row h-full">
                   {/* Image Side */}
@@ -129,12 +113,12 @@ export default function DoctorsPage() {
                           <Badge className="bg-[#14B8A6]/10 text-[#14B8A6] border-none rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-widest mb-3">
                             {doc.specialization}
                           </Badge>
-                          <h2 className="text-3xl md:text-5xl font-serif text-slate-900 leading-tight">Dr. {doc.full_name}</h2>
+                          <h2 className="text-3xl md:text-5xl font-serif text-slate-900 leading-tight">{doc.full_name}</h2>
                           <p className="text-slate-400 font-bold text-sm">{doc.qualification}</p>
                         </div>
-                        <div className="flex bg-slate-50 px-4 py-2 rounded-2xl items-center gap-2">
+                        <div className="flex bg-amber-50 px-4 py-2 rounded-2xl items-center gap-2 border border-amber-100">
                            <Star size={18} className="text-amber-400 fill-amber-400" />
-                           <span className="font-black text-slate-900">4.9</span>
+                           <span className="font-black text-slate-900">{doc.rating || '5.0'}</span>
                         </div>
                       </div>
 
@@ -154,32 +138,20 @@ export default function DoctorsPage() {
                           </div>
                           <div>
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Availability</p>
-                            <p className="text-slate-900 font-bold">{doc.availability || 'Daily Clinical Hours'}</p>
+                            <p className="text-slate-900 font-bold">{doc.availability_hours || 'Daily Clinical Hours'}</p>
                           </div>
                         </div>
                       </div>
 
-                      <div className="pt-6">
-                        <h4 className="text-[10px] font-black text-[#14B8A6] uppercase tracking-[0.2em] mb-4">Professional Expertise</h4>
+                       <div className="pt-6">
                         <p className="text-slate-600 leading-relaxed text-lg italic">
                           "{doc.experience_description || doc.short_bio || 'Dedicated to providing precision dental care and aesthetic excellence.'}"
                         </p>
                       </div>
                     </div>
-
-                    <div className="mt-12 flex flex-col sm:flex-row gap-6">
-                      <Link href={`/book?doctor=${doc.id}`} className="flex-1">
-                        <Button className="w-full h-16 rounded-2xl shadow-xl shadow-primary/20 bg-[#14B8A6] hover:bg-[#0F766E] font-black uppercase tracking-widest text-sm flex items-center justify-center gap-2">
-                          Book Visit with Dr. {doc.full_name.split(' ')[0]} <ChevronRight size={18} />
-                        </Button>
-                      </Link>
-                      <Button variant="outline" className="flex-1 h-16 rounded-2xl border-slate-200 text-slate-900 font-black uppercase tracking-widest text-sm">
-                        View Full Clinical Profile
-                      </Button>
-                    </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))
           )}
         </div>

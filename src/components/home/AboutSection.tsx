@@ -2,34 +2,45 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { motion, useInView } from 'framer-motion';
 import { Shield, CheckCircle, Award } from 'lucide-react';
 import Image from 'next/image';
 
 function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true });
+  const [hasAnimated, setHasAnimated] = useState(false);
 
   useEffect(() => {
-    if (!isInView) return;
-    
-    const duration = 2000;
-    const step = target / (duration / 16);
-    let current = 0;
-    
-    const timer = setInterval(() => {
-      current += step;
-      if (current >= target) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(current));
-      }
-    }, 16);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          const duration = 2000;
+          const step = target / (duration / 16);
+          let current = 0;
+          
+          const timer = setInterval(() => {
+            current += step;
+            if (current >= target) {
+              setCount(target);
+              clearInterval(timer);
+            } else {
+              setCount(Math.floor(current));
+            }
+          }, 16);
 
-    return () => clearInterval(timer);
-  }, [isInView, target]);
+          return () => clearInterval(timer);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [target, hasAnimated]);
 
   return (
     <div ref={ref} className="text-3xl font-black text-slate-900 mb-1">
@@ -44,6 +55,8 @@ export default function AboutSection() {
     patients: 25000,
     equipment: 'State of Art',
   });
+
+
 
   useEffect(() => {
     async function fetchStats() {
@@ -77,17 +90,11 @@ export default function AboutSection() {
   ];
 
   return (
-    <section id="about" className="py-24 bg-white overflow-hidden">
+    <section id="about" className="py-24 bg-premium-gradient overflow-hidden">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col lg:flex-row items-center gap-16">
+        <div className="flex flex-col lg:flex-row items-center gap-16 anim-group">
           {/* Image Side */}
-          <motion.div 
-            className="flex-1 relative"
-            initial={{ opacity: 0, x: -40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-          >
+          <div className="flex-1 relative anim-item">
             <div className="relative z-10 rounded-[3.5rem] overflow-hidden shadow-2xl shadow-primary/20 aspect-[4/5] border-8 border-white">
               <Image 
                 src="/images/doctors/doctor4.jpg" 
@@ -99,33 +106,24 @@ export default function AboutSection() {
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-60" />
             </div>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-50 rounded-full blur-3xl -z-10 opacity-60" />
-          </motion.div>
+          </div>
 
           {/* Text Side */}
-          <motion.div 
-            className="flex-1"
-            initial={{ opacity: 0, x: 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-          >
-            <h2 className="text-sm font-bold text-primary tracking-[0.2em] uppercase mb-4">Our Legacy</h2>
-            <h3 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 mb-8 leading-tight">
+          <div className="flex-1">
+            <h2 className="text-sm font-bold text-primary tracking-[0.2em] uppercase mb-4 anim-item">Our Legacy</h2>
+            <h3 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 mb-8 leading-tight anim-item">
               A Decade of Excellence in <span className="text-primary italic">Dental Healthcare</span>
             </h3>
-            <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-              Established in 2011, Dr. Rohit&apos;s Dental Clinic has been a pioneer in advanced dentistry in Kathua. Led by Dr. Rohit Bhadwal, our team is committed to providing compassionate care using the latest technologies in orthodontics and implantology.
+            <p className="text-lg text-slate-600 mb-8 leading-relaxed anim-item font-medium">
+              Welcome to <span className="text-primary font-bold">Dr Rohit Dental Clinic Braces & Implant Centre</span>. Established in 2011, we have been a pioneer in advanced dentistry in Kathua, Jammu. Led by Dr. Rohit Bhadwal, our multi-speciality team is committed to providing compassionate care using the latest technologies in orthodontics and implantology.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {statCards.map((stat, i) => (
-                <motion.div 
+                <div 
                   key={i} 
-                  className="p-6 rounded-2xl bg-slate-50 border border-slate-100 transition-colors hover:border-blue-200 hover:bg-blue-50/50"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.15 }}
+                  className="p-6 rounded-2xl bg-slate-50 border border-slate-100 transition-colors hover:border-blue-200 hover:bg-blue-50/50 anim-item"
+                  style={{ transitionDelay: `${i * 100}ms` }}
                 >
                   <stat.icon className="w-8 h-8 text-primary mb-4" />
                   {stat.displayValue ? (
@@ -134,10 +132,10 @@ export default function AboutSection() {
                     <AnimatedCounter target={stat.value!} suffix={stat.suffix} />
                   )}
                   <div className="text-sm text-slate-500">{stat.label}</div>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

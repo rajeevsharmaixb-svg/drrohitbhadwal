@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { LayoutDashboard, Users, Stethoscope, Briefcase, Settings, LogOut, ShieldCheck, CalendarCheck, Menu, X, MessageSquare, Tag } from 'lucide-react';
@@ -49,17 +50,17 @@ export default function AdminLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0B1B3D] flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Verifying Clinical Access...</p>
+          <p className="text-slate-400 text-sm font-black uppercase tracking-widest animate-pulse">Verifying Clinical Access...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0B1B3D] flex selection:bg-primary/30">
+    <div className="min-h-screen bg-slate-50 flex selection:bg-primary/10">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div 
@@ -70,46 +71,51 @@ export default function AdminLayout({
 
       {/* Sidebar */}
       <aside className={`
-        w-64 bg-[#0A192F]/80 backdrop-blur-xl text-white flex flex-col fixed inset-y-0 border-r border-white/5 z-50
-        transition-transform duration-300
+        w-64 bg-white text-slate-900 flex flex-col fixed inset-y-0 border-r border-slate-200 z-50
+        transition-transform duration-300 shadow-xl
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0
       `}>
         <div className="p-8 border-b border-white/5 flex items-center gap-3">
-          <div className="bg-primary p-2 rounded-xl text-white shadow-lg">
-            <ShieldCheck size={24} />
+          <div className="rounded-xl overflow-hidden shadow-lg border-2 border-white/10 shrink-0">
+            <Image 
+              src="/images/logo.jpg" 
+              alt="Logo" 
+              width={36} 
+              height={36} 
+            />
           </div>
-          <h1 className="text-xl font-black tracking-tight">Admin Console</h1>
+          <h1 className="text-xl font-black tracking-tight">Clinical Console</h1>
         </div>
 
-        <nav className="flex-1 p-6 space-y-2">
+        <nav className="flex-1 p-6 space-y-1">
           {navItems.map((item) => (
             <Link 
               key={item.path} 
               href={item.path}
               onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm transition-all group ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all group ${
                 pathname === item.path 
-                  ? 'bg-white/10 text-white'
-                  : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                  ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                  : 'text-slate-400 hover:bg-slate-50 hover:text-primary'
               }`}
             >
-              <item.icon size={18} className={pathname === item.path ? 'text-primary' : 'group-hover:text-primary transition-colors'} />
+              <item.icon size={16} className={pathname === item.path ? 'text-white' : 'group-hover:text-primary transition-colors'} />
               {item.name}
             </Link>
           ))}
         </nav>
 
-        <div className="p-6 border-t border-white/5">
-          <div className="bg-slate-800/50 p-4 rounded-2xl mb-4">
-            <p className="text-[10px] uppercase font-bold text-slate-500 tracking-widest mb-1">Authenticated as</p>
-            <p className="text-xs font-bold text-white truncate">{user?.email}</p>
+        <div className="p-6 border-t border-slate-100 bg-slate-50/50">
+          <div className="p-4 rounded-2xl mb-4 bg-white border border-slate-200 shadow-sm">
+            <p className="text-[9px] uppercase font-black text-slate-400 tracking-widest mb-1">Authenticated Head</p>
+            <p className="text-[10px] font-black text-slate-900 truncate">{user?.email}</p>
           </div>
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-red-400 font-bold text-sm hover:bg-red-500/10 transition-all"
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-red-500 font-black text-[10px] uppercase tracking-widest hover:bg-red-50 transition-all border border-transparent hover:border-red-100"
           >
-            <LogOut size={18} /> Exit Console
+            <LogOut size={16} /> Logout Console
           </button>
         </div>
       </aside>
@@ -117,21 +123,21 @@ export default function AdminLayout({
       {/* Main Content */}
       <div className="flex-1 lg:ml-64 min-h-screen">
         {/* Mobile top bar */}
-        <div className="lg:hidden sticky top-0 bg-[#0A192F] border-b border-white/5 z-30 px-4 py-3 flex items-center justify-between shadow-sm">
+        <div className="lg:hidden sticky top-0 bg-white border-b border-slate-100 z-30 px-6 py-4 flex items-center justify-between shadow-sm">
           <button 
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-xl hover:bg-white/5 text-white"
+            className="p-2 rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100"
           >
-            <Menu size={24} />
+            <Menu size={20} />
           </button>
           <div className="flex items-center gap-2">
-            <ShieldCheck size={20} className="text-primary" />
-            <span className="font-bold text-sm text-white">Admin Console</span>
+            <ShieldCheck size={18} className="text-primary" />
+            <span className="font-black text-[10px] uppercase tracking-widest text-slate-900">Clinical Admin</span>
           </div>
-          <div className="w-10" /> {/* Spacer */}
+          <div className="w-8" />
         </div>
 
-        <main className="p-6 lg:p-10 min-h-screen bg-gradient-to-br from-[#0B1B3D] via-[#0A192F] to-[#0B1B3D] dark">
+        <main className="p-6 lg:p-10 min-h-screen bg-slate-50">
           {children}
         </main>
       </div>

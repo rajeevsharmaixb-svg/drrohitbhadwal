@@ -3,13 +3,14 @@ import { Inter, Outfit, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "react-hot-toast";
+import ScrollAnimController from "@/components/animations/ScrollAnimController";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 
 export const metadata: Metadata = {
-  title: "Dr. Rohit's Dental & Implant Centre",
+  title: "Dr. Rohit Bhadwal's Dental & Implant Centre",
   description: "Creating Confident Smiles with Advanced Dental Care. Established since 2011 in Kathua, J&K.",
   keywords: ["dentist", "kathua", "braces", "dental implants", "dr rohit bhadwal"],
 };
@@ -24,6 +25,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${outfit.variable} ${playfair.variable} antialiased`}>
         <AuthProvider>
           <Toaster position="top-center" />
+          <ScrollAnimController />
           {children}
         </AuthProvider>
       </body>

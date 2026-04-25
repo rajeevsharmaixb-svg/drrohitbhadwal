@@ -83,11 +83,11 @@ export default function AdminTreatmentsPage() {
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
             <Tag className="text-primary" size={32} />
             Treatments & Pricing
           </h1>
-          <p className="text-slate-400 mt-2">
+          <p className="text-slate-500 mt-2 font-medium">
             Manage clinical procedures and standard price estimates
           </p>
         </div>
@@ -100,7 +100,7 @@ export default function AdminTreatmentsPage() {
         </button>
       </div>
 
-      <div className="bg-[#0A192F] rounded-3xl p-8 border border-white/5">
+      <div className="bg-white rounded-[3rem] p-8 border border-slate-100 shadow-xl">
         {loading ? (
           <div className="text-center py-10 text-slate-400">
             Loading treatments...
@@ -117,7 +117,7 @@ export default function AdminTreatmentsPage() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, name: e.target.value })
                     }
-                    className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 focus:ring-1 focus:ring-primary outline-none"
                   />
                   <input
                     type="text"
@@ -126,7 +126,7 @@ export default function AdminTreatmentsPage() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, category: e.target.value })
                     }
-                    className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 focus:ring-1 focus:ring-primary outline-none"
                   />
                   <input
                     type="text"
@@ -135,7 +135,7 @@ export default function AdminTreatmentsPage() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, price_range: e.target.value })
                     }
-                    className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 focus:ring-1 focus:ring-primary outline-none"
                   />
                   <input
                     type="number"
@@ -147,7 +147,7 @@ export default function AdminTreatmentsPage() {
                         sort_order: parseInt(e.target.value),
                       })
                     }
-                    className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 focus:ring-1 focus:ring-primary outline-none"
                   />
                   <textarea
                     placeholder="Description"
@@ -155,7 +155,7 @@ export default function AdminTreatmentsPage() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, description: e.target.value })
                     }
-                    className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white md:col-span-2 h-20"
+                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 focus:ring-1 focus:ring-primary outline-none md:col-span-2 h-20"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -189,7 +189,7 @@ export default function AdminTreatmentsPage() {
                       onChange={(e) =>
                         setEditForm({ ...editForm, name: e.target.value })
                       }
-                      className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                      className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 focus:ring-1 focus:ring-primary outline-none"
                     />
                     <input
                       type="text"
@@ -254,32 +254,32 @@ export default function AdminTreatmentsPage() {
               ) : (
                 <div
                   key={t.id}
-                  className="bg-[#0B1B3D]/50 border border-white/5 p-6 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4 hover:border-primary/30 transition-colors"
+                  className="bg-white border border-slate-100 p-6 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4 hover:border-primary/30 transition-colors shadow-sm"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-1">
-                      <h3 className="font-bold text-white text-lg">{t.name}</h3>
+                      <h3 className="font-bold text-slate-900 text-lg">{t.name}</h3>
                       <span className="text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/10 px-2 py-1 rounded-md">
                         {t.category}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-400 line-clamp-1 mb-2">
+                    <p className="text-sm text-slate-500 line-clamp-1 mb-2">
                       {t.description}
                     </p>
-                    <p className="text-emerald-400 font-bold">
+                    <p className="text-emerald-500 font-bold">
                       {t.price_range}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => startEdit(t)}
-                      className="p-3 rounded-xl bg-white/5 hover:bg-primary hover:text-white text-slate-400 transition-colors"
+                      className="p-3 rounded-xl bg-slate-50 hover:bg-primary hover:text-white text-slate-400 transition-colors"
                     >
                       <Edit2 size={18} />
                     </button>
                     <button
                       onClick={() => handleDelete(t.id)}
-                      className="p-3 rounded-xl bg-white/5 hover:bg-red-500 hover:text-white text-slate-400 transition-colors"
+                      className="p-3 rounded-xl bg-slate-50 hover:bg-red-500 hover:text-white text-slate-400 transition-colors"
                     >
                       <Trash2 size={18} />
                     </button>

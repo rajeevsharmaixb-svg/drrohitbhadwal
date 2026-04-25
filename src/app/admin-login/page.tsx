@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -9,11 +10,17 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { ShieldCheck, Lock, AlertTriangle, Mail, Phone, MapPin } from 'lucide-react';
 
 // Configuration - Update this with your admin details
+const ADMIN_EMAILS = [
+  'drrohitbhadwal@gmail.com',
+  'ajeev369@gmail.com',
+  'rajeevsharma.ixb@gmail.com',
+];
+
 const ADMIN_CONFIG = {
-  email: 'ajeev369@gmail.com',
-  clinicName: 'Dr Rohit Dental Clinic',
+  email: 'drrohitbhadwal@gmail.com',
+  clinicName: 'Dr. Rohit Bhadwal\'s Dental & Implant Centre',
   supportPhone: '+91 90184 64914',
-  supportEmail: 'drrohitdentalclinic@gmail.com',
+  supportEmail: 'drrohitbhadwal@gmail.com',
   address: '9GFF+Q72 Shaheedi Smarak, CHOWK, College Rd, Urliwand, Kathua, J&K 184101',
 };
 
@@ -31,9 +38,9 @@ function AdminLoginForm() {
     setLoading(true);
     setError(null);
 
-    // Verify email matches admin email
-    if (email.toLowerCase() !== ADMIN_CONFIG.email.toLowerCase()) {
-      setError('Invalid admin email. Please use the authorized administrator email.');
+    // Verify email is in the authorized admin list
+    if (!ADMIN_EMAILS.some(e => e.toLowerCase() === email.toLowerCase())) {
+      setError('Invalid admin email. Please use an authorized administrator email.');
       setLoading(false);
       return;
     }
@@ -134,11 +141,11 @@ function AdminLoginForm() {
 
 function AdminInfoCard() {
   return (
-    <Card className="border-none shadow-lg rounded-2xl bg-white/5 backdrop-blur-sm mt-6 border border-white/10 hover:bg-white/10 transition-all duration-300">
+    <Card className="border-none shadow-xl rounded-2xl bg-white mt-6 border border-slate-100 hover:shadow-2xl transition-all duration-300">
       <CardContent className="p-6">
-        <h3 className="font-bold text-white mb-4 flex items-center gap-2 border-b border-white/10 pb-3">
-          <Mail size={18} className="text-amber-400" />
-          Admin Contact Information
+        <h3 className="font-black text-slate-900 mb-4 flex items-center gap-2 border-b border-slate-100 pb-3 text-xs uppercase tracking-widest">
+          <Mail size={16} className="text-amber-500" />
+          Technical Support Info
         </h3>
         <div className="space-y-4">
           <div className="flex items-start gap-3">
@@ -146,10 +153,10 @@ function AdminInfoCard() {
               <Mail size={16} className="text-amber-400 shrink-0" />
             </div>
             <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Support Email</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Internal Mail</p>
               <a
                 href={`mailto:${ADMIN_CONFIG.supportEmail}`}
-                className="text-white text-sm font-medium hover:text-amber-400 transition-colors"
+                className="text-primary text-sm font-bold hover:underline transition-colors"
               >
                 {ADMIN_CONFIG.supportEmail}
               </a>
@@ -161,10 +168,10 @@ function AdminInfoCard() {
               <Phone size={16} className="text-amber-400 shrink-0" />
             </div>
             <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Support Phone</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Hotline</p>
               <a
                 href={`tel:${ADMIN_CONFIG.supportPhone.replace(/[^0-9+]/g, '')}`}
-                className="text-white text-sm font-medium hover:text-amber-400 transition-colors"
+                className="text-primary text-sm font-bold hover:underline transition-colors"
               >
                 {ADMIN_CONFIG.supportPhone}
               </a>
@@ -176,8 +183,8 @@ function AdminInfoCard() {
               <MapPin size={16} className="text-amber-400 shrink-0" />
             </div>
             <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Clinic Address</p>
-              <p className="text-white text-sm font-medium leading-relaxed">{ADMIN_CONFIG.address}</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Clinic Identity</p>
+              <p className="text-slate-600 text-sm font-medium leading-relaxed">{ADMIN_CONFIG.address}</p>
             </div>
           </div>
         </div>
@@ -188,16 +195,21 @@ function AdminInfoCard() {
 
 export default function AdminLoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <div className="bg-amber-500/20 p-3 rounded-full border border-amber-500/30">
-              <ShieldCheck size={32} className="text-amber-400" />
+          <div className="inline-flex items-center gap-4 mb-4">
+            <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-500/30">
+              <Image
+                src="/images/logo.jpg"
+                alt="Logo"
+                width={64}
+                height={64}
+              />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-white">{ADMIN_CONFIG.clinicName}</h1>
-          <p className="text-slate-400 font-medium text-sm mt-1">Admin Control Panel</p>
+          <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tighter">Dr. Rohit Bhadwal&apos;s</h1>
+          <p className="text-primary font-black text-[10px] uppercase tracking-[0.2em] mt-2">Clinical Admin Console</p>
         </div>
 
         <Suspense fallback={

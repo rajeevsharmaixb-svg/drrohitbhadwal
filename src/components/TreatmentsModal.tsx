@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X, Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -15,6 +16,16 @@ export default function TreatmentsModal({
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
+
+  // Body scroll lock
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -45,14 +56,14 @@ export default function TreatmentsModal({
       t.category?.toLowerCase().includes(search.toLowerCase()),
   );
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+  const modalContent = (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
         {/* Header */}
         <div className="p-6 md:p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div>
             <h2 className="text-2xl md:text-3xl font-serif font-[800] text-slate-900">
-              Treatments & Pricing
+              Pricing
             </h2>
             <p className="text-sm text-slate-500 mt-1">
               Explore our clinical procedures and transparent cost estimates.
@@ -127,4 +138,7 @@ export default function TreatmentsModal({
       </div>
     </div>
   );
+
+  if (typeof window === 'undefined') return modalContent;
+  return createPortal(modalContent, document.body);
 }

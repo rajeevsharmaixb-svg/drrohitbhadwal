@@ -10,9 +10,18 @@ export default function CTASection() {
       <div className="absolute inset-0 bg-blue-600" />
       <div className="container mx-auto px-4 relative z-10 text-center">
         <div className="max-w-3xl mx-auto bg-white/5 backdrop-blur-xl p-12 md:p-20 rounded-[3rem] border border-white/20 shadow-2xl">
+          <div className="flex justify-center mb-8">
+            <div className="rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 w-20 h-20">
+              <img 
+                src="/images/logo.jpg" 
+                alt="Logo" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
           <h2 className="text-3xl md:text-5xl font-serif font-bold text-white mb-8 tracking-tight">Ready for your transformation?</h2>
           <p className="text-xl text-blue-50 mb-12 opacity-90 mx-auto max-w-2xl leading-relaxed">
-            Join thousands of happy patients. Secure your appointment with Dr. Rohit and our expert team today.
+            Join thousands of happy patients. Secure your appointment with Dr. Rohit Bhadwal and our expert team today.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link href="/book">
