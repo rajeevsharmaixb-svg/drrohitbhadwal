@@ -15,7 +15,7 @@ export default function AboutPage() {
       <Navbar />
 
       <AboutSection />
-      
+
       <section className="py-20 bg-slate-50 overflow-hidden">
         <div className="container mx-auto px-4 anim-group">
           <div className="max-w-3xl mx-auto text-center mb-16 anim-heading fade-out-on-exit">
@@ -24,14 +24,14 @@ export default function AboutPage() {
               "To be the most trusted dental healthcare provider in the region by delivering world-class treatments at affordable prices."
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 gap-12">
             <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 anim-card">
               <h3 className="text-xl font-bold mb-4 text-primary">Why Choose Us?</h3>
               <ul className="space-y-3 text-slate-600">
                 <li className="flex items-start gap-3">
                   <span className="bg-blue-100 text-blue-600 p-1 rounded-full text-xs">✓</span>
-                  12+ Years of Clinical Expertise
+                  15+ Years of Clinical Expertise
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="bg-blue-100 text-blue-600 p-1 rounded-full text-xs">✓</span>
@@ -47,12 +47,12 @@ export default function AboutPage() {
                 </li>
               </ul>
             </div>
-            
+
             <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 anim-card">
               <h3 className="text-xl font-bold mb-4 text-primary">Patient Commitment</h3>
               <p className="text-slate-600 leading-relaxed">
-                At Dr Rohit Dental Clinic, we believe every patient deserves a smile they are proud to share. 
-                Our team focuses on preventive education, minimally invasive techniques, and personalized treatment plans 
+                At Dr Rohit Dental Clinic, we believe every patient deserves a smile they are proud to share.
+                Our team focuses on preventive education, minimally invasive techniques, and personalized treatment plans
                 tailored to your unique dental needs.
               </p>
             </div>
@@ -61,7 +61,7 @@ export default function AboutPage() {
       </section>
 
       <DoctorsSection />
-      
+
       <Footer />
       <FloatingWhatsApp />
     </main>
