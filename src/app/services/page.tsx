@@ -31,9 +31,9 @@ export default function ServicesPage() {
       reverse: true
     },
     {
-      title: "Braces & Aligners",
+      title: "Braces & Aligners - Orthodontic braces, invisible aligner",
       category: "Orthodontics",
-      description: "Correct misaligned teeth and jaw irregularities. From traditional ceramic braces to modern, invisible clear aligners, we offer tailored orthodontic plans for all age groups.",
+      description: "Orthodontic braces, invisible aligner. Correct misaligned teeth and jaw irregularities. From traditional ceramic braces to modern, invisible clear aligners, we offer tailored orthodontic plans for all age groups.",
       features: ["Clear Aligners & Invisible Braces", "Custom retention strategies", "Enhanced facial aesthetics"],
       image: "/images/services/aligners_close_up.webp",
       icon: Zap,

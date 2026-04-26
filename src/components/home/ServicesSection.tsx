@@ -22,7 +22,7 @@ export default function ServicesSection() {
       tag: 'Permanent Solution',
       description: 'Titanium implants fused naturally with bone, providing a permanent, stable foundation that looks and functions exactly like natural teeth.',
       icon: Shield,
-      image: '/images/services/root_canal.webp', // Fallback to root canal if implant img missing
+      image: '/images/services/dental_implant_update.png', // Updated image
     },
     {
       id: 3,
@@ -34,9 +34,9 @@ export default function ServicesSection() {
     },
     {
       id: 4,
-      name: 'Orthodontics (Braces)',
+      name: 'Orthodontics (Braces) - Orthodontic braces, invisible aligner',
       tag: 'Perfect Alignment',
-      description: 'Metal, ceramic, and clear aligner options — customised orthodontic plans to correct misaligned teeth and create a harmonious, confident smile.',
+      description: 'Orthodontic braces, invisible aligner. Metal, ceramic, and clear aligner options — customised orthodontic plans to correct misaligned teeth and create a harmonious, confident smile.',
       icon: Columns,
       image: '/images/services/orthodontics.webp',
     },
@@ -46,11 +46,11 @@ export default function ServicesSection() {
       tag: 'Advanced Technology',
       description: 'Precision laser treatments for gum reshaping, cavity detection, and painless soft-tissue procedures — faster healing, less discomfort.',
       icon: Sparkles,
-      image: '/images/tools/biosonic-close.jpg',
+      image: '/images/services/laser_dentistry_update.png',
     },
     {
       id: 6,
-      name: 'Smile Design',
+      name: 'Digital Smile Design',
       tag: 'Complete Transformation',
       description: 'Full digital smile design combining veneers, whitening, and cosmetic bonding — artistically crafted to enhance your natural beauty.',
       icon: ArrowRight,
@@ -70,7 +70,7 @@ export default function ServicesSection() {
       tag: 'Gentle & Fun',
       description: 'Specialized pediatric care focusing on building good habits and ensuring a stress-free experience for children.',
       icon: Baby,
-      image: '/images/services/consultation.webp',
+      image: '/images/services/kid_dentistry_update.png',
     },
     {
       id: 9,
@@ -83,7 +83,7 @@ export default function ServicesSection() {
   ];
 
   return (
-    <section id="services" className="py-24 bg-white relative overflow-hidden">
+    <section id="services" className="py-24 bg-premium-gradient relative overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-20 anim-group">
           <h2 className="text-sm font-bold text-primary tracking-[0.2em] uppercase mb-4 anim-item">Our Expertise</h2>

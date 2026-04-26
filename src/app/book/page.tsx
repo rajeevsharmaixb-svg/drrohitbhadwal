@@ -117,6 +117,7 @@ export default function BookPage() {
         initialServices={services}
         initialPackages={packages}
         consultationFee={settings?.consultation_fee || 200}
+        workingHours={settings?.working_hours ?? undefined}
       />
       
       <Footer />

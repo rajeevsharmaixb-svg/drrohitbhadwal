@@ -65,13 +65,15 @@ export default function AdminSettingsPage() {
 
   const saveSettings = async () => {
     setIsSubmitting(true);
+    const { id, updated_at, ...payload } = settings;
     const { error } = await supabase
       .from('clinic_settings')
-      .update(settings)
-      .eq('id', settings.id);
+      .update({ ...payload, updated_at: new Date().toISOString() })
+      .eq('id', id);
 
     if (error) {
-      toast.error('Failed to synchronize modifications');
+      toast.error(`Failed to save: ${error.message}`);
+      console.error('Supabase update error:', error);
     } else {
       toast.success('Clinical parameters updated successfully');
       setOriginalSettings(JSON.parse(JSON.stringify(settings)));
@@ -176,15 +178,15 @@ export default function AdminSettingsPage() {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2"><Mail size={14} className="text-slate-300" /> Administrative Email</label>
+                            <label className="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2"><Mail size={14} className="text-blue-500" /> Administrative Email</label>
                             <Input value={settings.email} onChange={(e) => handleUpdate('email', e.target.value)} className="rounded-2xl h-12" />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2"><MapPin size={14} className="text-slate-300" /> Physical Address</label>
+                            <label className="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2"><MapPin size={14} className="text-red-500" /> Physical Address</label>
                             <textarea 
                                 value={settings.address}
                                 onChange={(e) => handleUpdate('address', e.target.value)}
-                                className="w-full h-24 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                className="w-full h-24 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm text-slate-900 focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                             />
                         </div>
                     </CardContent>
@@ -358,7 +360,9 @@ export default function AdminSettingsPage() {
                                     <ShieldCheck size={14} className="text-primary" /> Cancellation Protocol
                                 </p>
                                 <textarea 
-                                    className="w-full h-32 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                    value={settings.cancellation_policy || ''}
+                                    onChange={(e) => handleUpdate('cancellation_policy', e.target.value)}
+                                    className="w-full h-32 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm text-slate-900 focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                                     placeholder="Patients must cancel 24 hours in advance..."
                                 />
                             </div>
@@ -367,7 +371,9 @@ export default function AdminSettingsPage() {
                                     <FileText size={14} className="text-primary" /> Terms & Service Summary
                                 </p>
                                 <textarea 
-                                    className="w-full h-32 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                    value={settings.terms_of_service || ''}
+                                    onChange={(e) => handleUpdate('terms_of_service', e.target.value)}
+                                    className="w-full h-32 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm text-slate-900 focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                                     placeholder="Standard medical terms of service..."
                                 />
                             </div>

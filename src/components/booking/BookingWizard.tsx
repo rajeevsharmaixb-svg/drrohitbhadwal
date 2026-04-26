@@ -1,22 +1,24 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ChevronRight, ChevronLeft, Calendar, Stethoscope, Package, User, Clock, CheckCircle2 } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Calendar, User, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import type { Database } from '@/lib/types';
-import { format } from 'date-fns';
+import { format, addDays } from 'date-fns';
 
 type Doctor = Database['public']['Tables']['doctors']['Row'];
 type Service = Database['public']['Tables']['services']['Row'];
 type Package = Database['public']['Tables']['packages']['Row'];
 type TimeSlot = Database['public']['Tables']['time_slots']['Row'];
+
+const JS_DAY_NAMES = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
 const formSchema = z.object({
   patient_name: z.string().min(2, 'Name is required'),
@@ -38,12 +40,24 @@ interface BookingWizardProps {
   initialPackages: Package[];
   user: any;
   consultationFee: number;
+  workingHours?: Record<string, { morning?: { open: string; close: string }; evening?: { open: string; close: string }; closed?: boolean }>;
 }
 
-export default function BookingWizard({ initialDoctors, initialServices, initialPackages, user, consultationFee }: BookingWizardProps) {
+function formatTime(t: string): string {
+  if (!t) return '';
+  const [h, m] = t.split(':').map(Number);
+  const period = h >= 12 ? 'PM' : 'AM';
+  const hour = h % 12 === 0 ? 12 : h % 12;
+  return `${hour}:${String(m).padStart(2, '0')} ${period}`;
+}
+
+export default function BookingWizard({
+  initialDoctors, initialServices, initialPackages, user, consultationFee, workingHours
+}: BookingWizardProps) {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const router = useRouter();
   const supabase = createClient();
@@ -64,30 +78,72 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
 
   const selectedDoctorId = watch('doctor_id');
 
+  // Determine if a date string (yyyy-MM-dd) is a clinic closed day
+  const isDateClosed = (dateStr: string): boolean => {
+    if (!workingHours) return false;
+    const dayName = JS_DAY_NAMES[new Date(dateStr + 'T00:00:00').getDay()];
+    return !!(workingHours[dayName]?.closed);
+  };
+
+  // Summary of open days for patient info
+  const openDaysSummary = useMemo(() => {
+    if (!workingHours) return null;
+    return JS_DAY_NAMES.map(day => ({
+      day: day.charAt(0).toUpperCase() + day.slice(1, 3),
+      closed: !!(workingHours[day]?.closed),
+      morning: workingHours[day]?.morning,
+      evening: workingHours[day]?.evening,
+    }));
+  }, [workingHours]);
+
+  // Min selectable date: today if open, else next open day (max 30 days ahead)
+  const minDate = useMemo(() => {
+    if (!workingHours) return format(new Date(), 'yyyy-MM-dd');
+    for (let i = 0; i < 30; i++) {
+      const d = format(addDays(new Date(), i), 'yyyy-MM-dd');
+      if (!isDateClosed(d)) return d;
+    }
+    return format(new Date(), 'yyyy-MM-dd');
+  }, [workingHours]);
+
+  // On selectedDate change, auto-skip closed days forward
+  const handleDateChange = (raw: string) => {
+    if (!raw) return;
+    if (workingHours && isDateClosed(raw)) {
+      // Find next open day
+      for (let i = 1; i <= 30; i++) {
+        const next = format(addDays(new Date(raw + 'T00:00:00'), i), 'yyyy-MM-dd');
+        if (!isDateClosed(next)) { setSelectedDate(next); return; }
+      }
+    }
+    setSelectedDate(raw);
+  };
+
   // Fetch slots based on date and doctor
   useEffect(() => {
     async function fetchSlots() {
+      setSlotsLoading(true);
       let query = supabase
         .from('time_slots')
         .select('*')
         .eq('slot_date', selectedDate)
-        .eq('is_available', true);
-      
-      if (selectedDoctorId) {
-        query = query.eq('doctor_id', selectedDoctorId);
-      }
+        .eq('is_available', true)
+        .order('start_time', { ascending: true });
+
+      if (selectedDoctorId) query = query.eq('doctor_id', selectedDoctorId);
 
       const { data, error } = await query;
       if (!error && data) setAvailableSlots(data);
+      else setAvailableSlots([]);
+      setSlotsLoading(false);
     }
     fetchSlots();
-  }, [selectedDate, selectedDoctorId, supabase]);
+  }, [selectedDate, selectedDoctorId]);
 
   const nextStep = async () => {
     let fieldsToValidate: any[] = [];
     if (step === 1) fieldsToValidate = ['patient_name', 'patient_phone', 'patient_address'];
     if (step === 2) fieldsToValidate = ['slot_id'];
-    
     const isValid = fieldsToValidate.length > 0 ? await trigger(fieldsToValidate as any) : true;
     if (isValid) setStep(prev => Math.min(prev + 1, 3));
   };
@@ -98,7 +154,6 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
     setIsSubmitting(true);
     try {
       const selectedSlot = availableSlots.find(s => s.id === data.slot_id);
-      
       const payload = {
         patient_id: user.id,
         patient_name: data.patient_name,
@@ -110,17 +165,16 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
         doctor_id: null,
         slot_id: data.slot_id,
         preferred_date: selectedDate,
-        preferred_time: selectedSlot ? `${selectedSlot.start_time} - ${selectedSlot.end_time} (${selectedSlot.shift})` : 'TBD',
+        preferred_time: selectedSlot
+          ? `${selectedSlot.start_time} - ${selectedSlot.end_time} (${selectedSlot.shift})`
+          : 'TBD',
         notes: data.notes,
         status: 'pending'
       };
 
       const { error } = await supabase.from('appointments').insert([payload]);
       if (error) throw error;
-
-      // Update slot availability
       await supabase.from('time_slots').update({ is_available: false }).eq('id', data.slot_id);
-
       router.push('/patient/dashboard?booking=success');
     } catch (err) {
       console.error(err);
@@ -129,6 +183,10 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
       setIsSubmitting(false);
     }
   };
+
+  const selectedDayName = JS_DAY_NAMES[new Date(selectedDate + 'T00:00:00').getDay()];
+  const selectedDayHours = workingHours?.[selectedDayName];
+  const isSelectedDayClosed = selectedDayHours?.closed === true;
 
   return (
     <div className="max-w-4xl mx-auto py-10 px-4">
@@ -147,12 +205,8 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
               </span>
             </div>
           ))}
-          {/* Progress Line */}
-          <div className="absolute top-5 left-[16.66%] right-[16.66%] h-[2px] bg-slate-200 -z-0"></div>
-          <div 
-            className="absolute top-5 left-[16.66%] h-[2px] bg-primary transition-all duration-500 -z-0" 
-            style={{ width: `${((step - 1) / 2) * 66.66}%` }}
-          ></div>
+          <div className="absolute top-5 left-[16.66%] right-[16.66%] h-[2px] bg-slate-200 -z-0" />
+          <div className="absolute top-5 left-[16.66%] h-[2px] bg-primary transition-all duration-500 -z-0" style={{ width: `${((step - 1) / 2) * 66.66}%` }} />
         </div>
       </div>
 
@@ -160,7 +214,7 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
         <CardHeader className="bg-gradient-to-r from-primary to-blue-600 text-white p-8 border-b border-white/10">
           <CardTitle className="text-2xl flex items-center gap-3">
             {step === 1 && <><User size={24} className="text-blue-400" /> Patient Information</>}
-            {step === 2 && <><Clock size={24} className="text-amber-400" /> Select Date & Time</>}
+            {step === 2 && <><Clock size={24} className="text-amber-400" /> Select Date &amp; Time</>}
             {step === 3 && <><CheckCircle2 size={24} className="text-green-400" /> Final Review</>}
           </CardTitle>
           <CardDescription className="text-slate-400">
@@ -169,6 +223,7 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
         </CardHeader>
 
         <CardContent className="p-8">
+          {/* STEP 1: Patient Details */}
           {step === 1 && (
             <div className="grid md:grid-cols-2 gap-6 animate-in fade-in duration-500">
               <div className="space-y-2">
@@ -183,7 +238,7 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
               </div>
               <div className="md:col-span-2 space-y-2">
                 <label className="text-sm font-bold text-slate-700">Home Address</label>
-                <textarea 
+                <textarea
                   {...register('patient_address')}
                   placeholder="Enter your full residential address"
                   className="w-full h-20 bg-white text-slate-900 border border-slate-200 rounded-xl p-4 text-sm focus:ring-2 focus:ring-primary outline-none shadow-sm transition-colors"
@@ -197,46 +252,101 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
             </div>
           )}
 
+          {/* STEP 2: Date & Slot */}
           {step === 2 && (
-
             <div className="space-y-8 animate-in fade-in duration-500">
+
+              {/* Open Days Visual Guide */}
+              {openDaysSummary && (
+                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Clinic Schedule</p>
+                  <div className="flex gap-1.5 flex-wrap">
+                    {openDaysSummary.map(({ day, closed, morning, evening }) => (
+                      <div key={day} title={
+                        closed ? `${day}: Closed` :
+                        [morning?.open && `${formatTime(morning.open)}–${formatTime(morning.close)}`, evening?.open && `${formatTime(evening.open)}–${formatTime(evening.close)}`].filter(Boolean).join(' & ')
+                      }
+                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider border ${
+                          closed
+                            ? 'bg-red-50 text-red-400 border-red-100 line-through opacity-60'
+                            : 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                        }`}>
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex flex-col md:flex-row gap-8">
                 <div className="flex-1 space-y-4">
                   <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
                     <Calendar size={18} className="text-primary" /> Select Date
                   </label>
-                  <Input 
-                    type="date" 
-                    value={selectedDate} 
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    min={format(new Date(), 'yyyy-MM-dd')}
+                  <Input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => handleDateChange(e.target.value)}
+                    min={minDate}
                     className="h-12 text-lg text-center"
                   />
+
+                  {/* Closed Day Warning */}
+                  {isSelectedDayClosed && (
+                    <div className="flex items-center gap-2 bg-red-50 border border-red-100 rounded-xl p-3 text-red-700 text-xs font-medium">
+                      <AlertCircle size={16} className="shrink-0" />
+                      Clinic is closed on {selectedDayName.charAt(0).toUpperCase() + selectedDayName.slice(1)}s. Moved to next open day automatically.
+                    </div>
+                  )}
+
+                  {/* Day Hours Info */}
+                  {!isSelectedDayClosed && selectedDayHours && (
+                    <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-emerald-800 text-xs space-y-1">
+                      <p className="font-bold uppercase tracking-widest text-[10px] text-emerald-500">Clinic Open — {selectedDayName.charAt(0).toUpperCase() + selectedDayName.slice(1)}</p>
+                      {selectedDayHours.morning?.open && (
+                        <p>🌅 Morning: {formatTime(selectedDayHours.morning.open)} – {formatTime(selectedDayHours.morning.close)}</p>
+                      )}
+                      {selectedDayHours.evening?.open && (
+                        <p>🌆 Evening: {formatTime(selectedDayHours.evening.open)} – {formatTime(selectedDayHours.evening.close)}</p>
+                      )}
+                    </div>
+                  )}
                 </div>
-                
+
                 <div className="flex-[2] space-y-4">
                   <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
                     <Clock size={18} className="text-primary" /> Select Available Slot
                   </label>
-                  {availableSlots.length > 0 ? (
+
+                  {slotsLoading ? (
+                    <div className="grid grid-cols-3 gap-3">
+                      {[1,2,3,4,5,6].map(i => (
+                        <div key={i} className="h-16 rounded-xl bg-slate-100 animate-pulse" />
+                      ))}
+                    </div>
+                  ) : availableSlots.length > 0 ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {availableSlots.map((slot) => (
-                        <div 
+                        <div
                           key={slot.id}
                           onClick={() => setValue('slot_id', slot.id)}
                           className={`p-3 rounded-xl border-2 text-center cursor-pointer transition-all ${
-                            watch('slot_id') === slot.id ? 'border-primary bg-blue-50 text-primary font-bold' : 'border-slate-100 hover:border-slate-200'
+                            watch('slot_id') === slot.id
+                              ? 'border-primary bg-blue-50 text-primary font-bold shadow-sm'
+                              : 'border-slate-100 hover:border-primary/40 hover:bg-slate-50'
                           }`}
                         >
-                          <p className="text-sm">{slot.start_time.substring(0, 5)}</p>
-                          <p className="text-[9px] uppercase opacity-70">{slot.shift}</p>
+                          <p className="text-sm font-bold">{formatTime(slot.start_time.substring(0, 5))}</p>
+                          <p className={`text-[9px] uppercase tracking-widest mt-0.5 ${
+                            slot.shift === 'morning' ? 'text-amber-500' : 'text-indigo-500'
+                          }`}>{slot.shift}</p>
                         </div>
                       ))}
                     </div>
                   ) : (
                     <div className="bg-amber-50 border border-amber-100 p-6 rounded-2xl text-center">
-                      <p className="text-amber-800 text-sm font-medium">No slots found for this date/doctor.</p>
-                      <p className="text-amber-600 text-[10px] mt-1">Please try a different date or select 'Any Doctor'.</p>
+                      <p className="text-amber-800 text-sm font-medium">No available slots for this date.</p>
+                      <p className="text-amber-600 text-[10px] mt-1">Try a different date or contact the clinic directly.</p>
                     </div>
                   )}
                   {errors.slot_id && <p className="text-xs text-red-500 font-medium">{errors.slot_id.message}</p>}
@@ -245,6 +355,7 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
             </div>
           )}
 
+          {/* STEP 3: Review */}
           {step === 3 && (
             <div className="space-y-6 animate-in fade-in duration-500">
               <div className="bg-slate-50 p-8 rounded-3xl space-y-6">
@@ -257,35 +368,37 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
                   </div>
                   <div>
                     <h5 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Clinical Appointment</h5>
-                    <p className="font-bold text-slate-800">{format(new Date(selectedDate), 'MMMM dd, yyyy')}</p>
-                    <p className="text-sm text-primary font-bold">Slot: {availableSlots.find(s => s.id === watch('slot_id'))?.start_time.substring(0, 5) || 'N/A'}</p>
+                    <p className="font-bold text-slate-800">{format(new Date(selectedDate + 'T00:00:00'), 'MMMM dd, yyyy')}</p>
+                    <p className="text-sm text-primary font-bold">
+                      {(() => {
+                        const slot = availableSlots.find(s => s.id === watch('slot_id'));
+                        return slot ? `${formatTime(slot.start_time.substring(0,5))} – ${formatTime(slot.end_time.substring(0,5))} (${slot.shift})` : 'N/A';
+                      })()}
+                    </p>
                   </div>
                 </div>
-                
+
                 <div className="border-t border-slate-200 pt-6">
                   <h5 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Treatment Plan</h5>
-                  <p className="font-bold text-slate-800">
-                    General Consultation
-                  </p>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Care by: Next Available Doctor
-                  </p>
+                  <p className="font-bold text-slate-800">General Consultation</p>
+                  <p className="text-xs text-slate-500 mt-1">Care by: Next Available Doctor</p>
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-slate-700">Special Notes / Symptoms</label>
-                  <textarea 
+                  <textarea
                     {...register('notes')}
                     placeholder="Describe your symptoms or medical history..."
                     className="w-full h-32 bg-white text-slate-900 border border-slate-200 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-primary outline-none shadow-sm transition-colors"
                   />
                 </div>
-                
+
                 <div className="border-t border-slate-200 pt-6">
-                  <h5 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Payment Options</h5>
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <a 
-                      href={`https://wa.me/919018464914?text=Hi, I would like to pay the consultation fee for my appointment on ${selectedDate}. Patient Name: ${watch('patient_name')}. Address: ${watch('patient_address')}`}
+                  <h5 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Consultation Fee</h5>
+                  <p className="text-2xl font-bold text-slate-900">₹{consultationFee}</p>
+                  <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                    <a
+                      href={`https://wa.me/919018464914?text=Hi, I'd like to pay the consultation fee for my appointment on ${selectedDate}. Patient: ${watch('patient_name')}. Address: ${watch('patient_address')}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 bg-[#25D366] hover:bg-[#20bd5a] text-white py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-bold transition-colors"
@@ -301,9 +414,9 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
         </CardContent>
 
         <CardFooter className="p-8 bg-slate-50 flex justify-between sticky bottom-0 z-10 border-t border-slate-100/50 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.05)]">
-          <Button 
-            variant="outline" 
-            onClick={() => step === 1 ? router.push('/book') : prevStep()} 
+          <Button
+            variant="outline"
+            onClick={() => step === 1 ? router.push('/book') : prevStep()}
             disabled={isSubmitting}
             className="rounded-xl flex-1 max-w-[120px] md:max-w-none text-sm md:text-base mr-4 border-2 border-slate-300 hover:border-primary hover:text-primary transition-all shadow-sm"
           >
@@ -320,13 +433,13 @@ export default function BookingWizard({ initialDoctors, initialServices, initial
                 Skip Payment
               </Button>
               <Button onClick={handleSubmit(onSubmit)} className="rounded-xl flex-[2] md:flex-none md:px-10 bg-primary hover:bg-primary/90 text-sm md:text-base whitespace-nowrap px-2" disabled={isSubmitting}>
-                {isSubmitting ? 'Processing...' : 'Confirm'}
+                {isSubmitting ? 'Processing...' : 'Confirm Appointment'}
               </Button>
             </div>
           )}
         </CardFooter>
       </Card>
-      
+
       <p className="text-center text-slate-400 text-[10px] mt-8">
         By continuing, you agree to Dr. Rohit Bhadwal&apos;s digital privacy policy and clinical attendance protocols.
       </p>
