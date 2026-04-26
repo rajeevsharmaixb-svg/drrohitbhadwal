@@ -53,7 +53,7 @@ export default function GuestBookPage() {
         .select('*')
         .eq('slot_date', formData.preferred_date)
         .eq('is_available', true);
-      
+
       if (selectedDoctor) {
         query = query.eq('doctor_id', selectedDoctor);
       }
@@ -83,7 +83,7 @@ export default function GuestBookPage() {
       patient_phone: formData.patient_phone,
       patient_email: formData.patient_email || null,
       preferred_date: formData.preferred_date,
-      preferred_time: selectedSlotData 
+      preferred_time: selectedSlotData
         ? `${selectedSlotData.start_time} - ${selectedSlotData.end_time} (${selectedSlotData.shift})`
         : 'To be confirmed',
       service_id: formData.service_id || null,
@@ -129,9 +129,9 @@ export default function GuestBookPage() {
             </p>
 
             <div className="space-y-4">
-              <a 
+              <a
                 href={`https://wa.me/919018464914?text=Hi%20Dr.%20Rohit%2C%20I%20just%20booked%20an%20appointment%20for%20${formData.preferred_date}.%20My%20name%20is%20${encodeURIComponent(formData.patient_name)}.`}
-                target="_blank" 
+                target="_blank"
                 rel="noreferrer"
               >
                 <Button className="w-full h-12 rounded-xl bg-green-500 hover:bg-green-600 flex items-center justify-center gap-2">
@@ -158,7 +158,7 @@ export default function GuestBookPage() {
       <div className="bg-gradient-to-r from-primary to-blue-700 py-12 px-4 shadow-inner">
         <div className="container mx-auto text-center relative max-w-3xl">
           <Link href="/book" className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 text-white/80 hover:text-white items-center font-medium transition-colors text-sm">
-            <ChevronLeft size={18} className="mr-1" /> Back
+            <ChevronLeft size={18} className="mr-1" /> Back -
           </Link>
           <h1 className="text-3xl font-bold text-white mb-2">Quick Guest Booking</h1>
           <p className="text-blue-200 text-sm">No account needed — Book your dental visit in 30 seconds</p>
@@ -186,7 +186,7 @@ export default function GuestBookPage() {
                   </label>
                   <Input
                     value={formData.patient_name}
-                    onChange={(e) => setFormData({...formData, patient_name: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, patient_name: e.target.value })}
                     placeholder="Your full name"
                     required
                   />
@@ -197,7 +197,7 @@ export default function GuestBookPage() {
                   </label>
                   <Input
                     value={formData.patient_phone}
-                    onChange={(e) => setFormData({...formData, patient_phone: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, patient_phone: e.target.value })}
                     placeholder="+91..."
                     required
                   />
@@ -209,7 +209,7 @@ export default function GuestBookPage() {
                 <Input
                   type="email"
                   value={formData.patient_email}
-                  onChange={(e) => setFormData({...formData, patient_email: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, patient_email: e.target.value })}
                   placeholder="email@example.com"
                 />
               </div>
@@ -221,7 +221,7 @@ export default function GuestBookPage() {
                 </label>
                 <select
                   value={formData.service_id}
-                  onChange={(e) => setFormData({...formData, service_id: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, service_id: e.target.value })}
                   className="w-full h-12 bg-white text-slate-900 border border-slate-200 rounded-xl px-4 focus:ring-2 focus:ring-primary outline-none shadow-sm cursor-pointer"
                 >
                   <option value="" className="text-slate-900 bg-white">General Consultation (₹200)</option>
@@ -238,9 +238,8 @@ export default function GuestBookPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedDoctor('')}
-                    className={`p-3 rounded-xl border-2 text-center text-sm transition-all ${
-                      !selectedDoctor ? 'border-primary bg-blue-50 text-primary font-bold' : 'border-slate-100 hover:border-slate-200'
-                    }`}
+                    className={`p-3 rounded-xl border-2 text-center text-sm transition-all ${!selectedDoctor ? 'border-primary bg-blue-50 text-primary font-bold' : 'border-slate-100 hover:border-slate-200'
+                      }`}
                   >
                     Any Doctor
                   </button>
@@ -249,9 +248,8 @@ export default function GuestBookPage() {
                       type="button"
                       key={d.id}
                       onClick={() => setSelectedDoctor(d.id)}
-                      className={`p-3 rounded-xl border-2 text-center text-sm transition-all ${
-                        selectedDoctor === d.id ? 'border-primary bg-blue-50 text-primary font-bold' : 'border-slate-100 hover:border-slate-200'
-                      }`}
+                      className={`p-3 rounded-xl border-2 text-center text-sm transition-all ${selectedDoctor === d.id ? 'border-primary bg-blue-50 text-primary font-bold' : 'border-slate-100 hover:border-slate-200'
+                        }`}
                     >
                       Dr. {d.full_name.split(' ')[0]}
                     </button>
@@ -268,7 +266,7 @@ export default function GuestBookPage() {
                   <Input
                     type="date"
                     value={formData.preferred_date}
-                    onChange={(e) => setFormData({...formData, preferred_date: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, preferred_date: e.target.value })}
                     min={format(new Date(), 'yyyy-MM-dd')}
                     className="h-12 text-center"
                   />
@@ -285,11 +283,10 @@ export default function GuestBookPage() {
                           type="button"
                           key={slot.id}
                           onClick={() => setSelectedSlot(slot.id)}
-                          className={`p-2 rounded-lg border text-center text-xs transition-all ${
-                            selectedSlot === slot.id 
-                              ? 'border-primary bg-blue-50 text-primary font-bold' 
+                          className={`p-2 rounded-lg border text-center text-xs transition-all ${selectedSlot === slot.id
+                              ? 'border-primary bg-blue-50 text-primary font-bold'
                               : 'border-slate-100 hover:border-slate-200'
-                          }`}
+                            }`}
                         >
                           {slot.start_time.substring(0, 5)}
                           <span className="block text-[9px] opacity-60 uppercase">{slot.shift}</span>
@@ -309,7 +306,7 @@ export default function GuestBookPage() {
                 <label className="text-sm font-bold text-slate-700">Special Notes / Symptoms</label>
                 <textarea
                   value={formData.message}
-                  onChange={(e) => setFormData({...formData, message: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   placeholder="Describe your symptoms or any medical history..."
                   className="w-full h-32 bg-white text-slate-900 border border-slate-200 rounded-xl p-4 text-sm focus:ring-2 focus:ring-primary outline-none shadow-sm transition-colors resize-none"
                 />
@@ -321,9 +318,9 @@ export default function GuestBookPage() {
                 </div>
               )}
 
-              <Button 
-                type="submit" 
-                className="w-full h-14 rounded-xl text-lg font-bold transition-all hover:shadow-lg" 
+              <Button
+                type="submit"
+                className="w-full h-14 rounded-xl text-lg font-bold transition-all hover:shadow-lg"
                 disabled={loading}
               >
                 {loading ? 'Submitting...' : '✓ Confirm Booking'}
