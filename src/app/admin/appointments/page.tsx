@@ -20,8 +20,7 @@ import {
 } from '@/components/ui/Table';
 import { Skeleton } from '@/components/ui/Skeleton';
 import toast from 'react-hot-toast';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+// jsPDF + autoTable are dynamically imported inside generatePDF to avoid SSR issues
 
 // Extend jsPDF with autotable
 declare module 'jspdf' {
@@ -51,6 +50,12 @@ export default function AdminAppointmentsPage() {
   const generatePDF = async () => {
     setIsExporting(true);
     try {
+      // jsPDF v4: named export, not default
+      const { jsPDF } = await import('jspdf');
+      // jspdf-autotable v5: must explicitly register the plugin
+      const { applyPlugin } = await import('jspdf-autotable');
+      applyPlugin(jsPDF);
+
       const doc = new jsPDF();
       const months = parseInt(exportRange);
       const cutoffDate = subMonths(new Date(), months);
@@ -74,7 +79,7 @@ export default function AdminAppointmentsPage() {
       
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(22);
-      doc.setFont('serif', 'bold');
+      doc.setFont('times', 'bold');
       doc.text("Dr. Rohit's Dental & Implant Centre", 15, 25);
       
       doc.setFontSize(10);
@@ -94,11 +99,11 @@ export default function AdminAppointmentsPage() {
         startY: 75,
         head: [['Metric', 'Quantity', 'System Health']],
         body: [
-          ['Total Reservations', stats.total, '100% Pipeline'],
-          ['Completed Cycles', stats.completed, `${stats.total > 0 ? ((stats.completed/stats.total)*100).toFixed(1) : 0}% Success`],
-          ['Live Confirmations', stats.confirmed, `${stats.total > 0 ? ((stats.confirmed/stats.total)*100).toFixed(1) : 0}% Active`],
-          ['Rejected/Cancelled', stats.rejected, 'Clinical Drift'],
-          ['Pending Review', stats.pending, 'Queue Depth']
+          ['Total Reservations', String(stats.total), '100% Pipeline'],
+          ['Completed Cycles', String(stats.completed), `${stats.total > 0 ? ((stats.completed/stats.total)*100).toFixed(1) : 0}% Success`],
+          ['Live Confirmations', String(stats.confirmed), `${stats.total > 0 ? ((stats.confirmed/stats.total)*100).toFixed(1) : 0}% Active`],
+          ['Rejected/Cancelled', String(stats.rejected), 'Clinical Drift'],
+          ['Pending Review', String(stats.pending), 'Queue Depth']
         ],
         theme: 'grid',
         headStyles: { fillColor: [20, 184, 166], textColor: 255, fontStyle: 'bold' },
@@ -107,11 +112,11 @@ export default function AdminAppointmentsPage() {
 
       // Detailed Table
       doc.autoTable({
-        startY: (doc as any).lastAutoTable.finalY + 15,
+        startY: ((doc as any).lastAutoTable?.finalY ?? 140) + 15,
         head: [['Date', 'Patient', 'Treatment', 'Doctor', 'Status']],
         body: filteredData.map(app => [
           format(new Date(app.preferred_date), 'dd/MM/yy'),
-          app.patient_name,
+          app.patient_name || 'Unknown',
           app.services?.name || 'Checkup',
           app.doctors?.full_name || 'N/A',
           (app.status || 'PENDING').toUpperCase()
@@ -133,11 +138,36 @@ export default function AdminAppointmentsPage() {
           doc.text("Strictly Confidential - For Internal Clinical Use Only", 140, 285);
       }
 
-      doc.save(`clinical-report-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+      const dataUri = doc.output('datauristring');
+      const base64Pdf = dataUri.split(',')[1];
+      const filename = `clinical-report-${format(new Date(), 'yyyy-MM-dd')}.pdf`;
+      
+      // Submit to the server route to ensure proper Content-Disposition headers
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/api/export-pdf';
+      form.style.display = 'none';
+      
+      const pdfInput = document.createElement('input');
+      pdfInput.type = 'hidden';
+      pdfInput.name = 'pdfBase64';
+      pdfInput.value = base64Pdf;
+      form.appendChild(pdfInput);
+      
+      const filenameInput = document.createElement('input');
+      filenameInput.type = 'hidden';
+      filenameInput.name = 'filename';
+      filenameInput.value = filename;
+      form.appendChild(filenameInput);
+      
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
       toast.success('Professional Report Downloaded');
       setIsExportOpen(false);
-    } catch (err) {
-      toast.error('PDF Engine error');
+    } catch (err: any) {
+      console.error('[PDF Engine] Generation failed:', err);
+      toast.error(`PDF Engine error: ${err?.message || 'Unknown failure'}`);
     }
     setIsExporting(false);
   };

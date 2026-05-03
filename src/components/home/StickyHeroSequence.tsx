@@ -93,9 +93,9 @@ export default function StickyHeroSequence() {
       scrollTrigger: {
         trigger: containerRef.current,
         pin: heroRef.current,
-        scrub: 1.2,
+        scrub: 0.3,
         start: 'top top',
-        end: '+=400%', // 400vh for scroll distance
+        end: '+=100%',
         anticipatePin: 1,
         onUpdate: () => render(),
         id: 'hero-scroll-trigger'
@@ -152,7 +152,7 @@ export default function StickyHeroSequence() {
   }, [framesLoaded]);
 
   return (
-    <div ref={containerRef} className="relative w-full sticky-container z-[60] -mt-20" style={{ height: '500vh', backgroundColor: '#000' }}>
+    <div ref={containerRef} className="relative w-full sticky-container z-[60] -mt-20" style={{ height: '200vh', backgroundColor: '#000' }}>
       <div 
         ref={heroRef} 
         className="sticky-hero top-0 w-full h-screen overflow-hidden flex items-center justify-center relative bg-black"

@@ -1,20 +1,25 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+
 const StickyHeroSequence = dynamic(
   () => import('@/components/home/StickyHeroSequence'),
   { ssr: false }
 );
+
+// Above-fold: eagerly loaded
 import Navbar from "@/components/layout/Navbar";
 import AboutSection from "@/components/home/AboutSection";
 import ServicesSection from "@/components/home/ServicesSection";
-import DoctorsSection from "@/components/home/DoctorsSection";
-import TestimonialsCarousel from "@/components/home/TestimonialsCarousel";
-import FAQSection from "@/components/home/FAQSection";
-import CTASection from "@/components/home/CTASection";
-import ContactSection from "@/components/home/ContactSection";
+
+// Below-fold: lazy loaded for faster initial paint
+const DoctorsSection = dynamic(() => import("@/components/home/DoctorsSection"), { ssr: false });
+const TestimonialsCarousel = dynamic(() => import("@/components/home/TestimonialsCarousel"), { ssr: false });
+const FAQSection = dynamic(() => import("@/components/home/FAQSection"), { ssr: false });
+const CTASection = dynamic(() => import("@/components/home/CTASection"), { ssr: false });
+const ContactSection = dynamic(() => import("@/components/home/ContactSection"), { ssr: false });
 import Footer from "@/components/layout/Footer";
-import FloatingWhatsApp from "@/components/FloatingWhatsApp";
+const FloatingWhatsApp = dynamic(() => import("@/components/FloatingWhatsApp"), { ssr: false });
 
 export default function Home() {
   return (

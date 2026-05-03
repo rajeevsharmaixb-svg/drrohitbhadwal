@@ -104,7 +104,7 @@
 .anim-item {
   opacity: 0;
   transform: translateY(28px);
-  transition: opacity 600ms ease-out, transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: opacity 150ms ease-out, transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   will-change: transform, opacity;
 }
 
@@ -126,7 +126,7 @@
   opacity: 0;
   transform: translateY(28px) scale(0.88);
   filter: blur(4px);
-  transition: opacity 600ms ease-out, transform 600ms cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 500ms ease-out;
+  transition: opacity 150ms ease-out, transform 150ms cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 125ms ease-out;
 }
 .anim-icon.is-visible {
   transform: translateY(0px) scale(1);
@@ -135,7 +135,7 @@
 .anim-heading {
   opacity: 0;
   transform: translateX(-20px);
-  transition: opacity 600ms ease-out, transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: opacity 150ms ease-out, transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 .anim-heading.is-visible {
   transform: translateX(0px);
@@ -144,7 +144,7 @@
 .anim-card {
   opacity: 0;
   transform: translateY(28px) scale(0.96);
-  transition: opacity 600ms ease-out, transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: opacity 150ms ease-out, transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 .anim-card.is-visible {
   transform: translateY(0px) scale(1);
@@ -152,7 +152,7 @@
 
 /* Fade out on exit animation settings */
 .fade-out-on-exit {
-  transition: opacity 400ms ease-in, transform 400ms ease-in !important;
+  transition: opacity 100ms ease-in, transform 100ms ease-in !important;
 }
 
 /* Accessibility: Reduced Motion Fallback */

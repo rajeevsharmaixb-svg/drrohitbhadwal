@@ -24,23 +24,47 @@ const ADMIN_CONFIG = {
   address: '9GFF+Q72 Shaheedi Smarak, CHOWK, College Rd, Urliwand, Kathua, J&K 184101',
 };
 
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_SECONDS = 60;
+
 function AdminLoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
 
   const router = useRouter();
   const supabase = createClient();
 
+  const recordFailure = () => {
+    const next = failedAttempts + 1;
+    setFailedAttempts(next);
+    if (next >= MAX_ATTEMPTS) {
+      setLockoutUntil(Date.now() + LOCKOUT_SECONDS * 1000);
+      setError(`Too many failed attempts. Please wait ${LOCKOUT_SECONDS} seconds.`);
+    } else {
+      setError('Invalid credentials. Please check your email and password.');
+    }
+  };
+
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
+
+    // Brute-force protection
+    if (lockoutUntil && Date.now() < lockoutUntil) {
+      const remaining = Math.ceil((lockoutUntil - Date.now()) / 1000);
+      setError(`Account locked. Please wait ${remaining} seconds.`);
+      return;
+    }
+
+    setLoading(true);
 
     // Verify email is in the authorized admin list
     if (!ADMIN_EMAILS.some(e => e.toLowerCase() === email.toLowerCase())) {
-      setError('Invalid admin email. Please use an authorized administrator email.');
+      recordFailure();
       setLoading(false);
       return;
     }
@@ -51,7 +75,7 @@ function AdminLoginForm() {
     });
 
     if (authError) {
-      setError(authError.message);
+      recordFailure();
       setLoading(false);
       return;
     }
@@ -60,11 +84,14 @@ function AdminLoginForm() {
     const role = data.user?.user_metadata?.role;
     if (role !== 'admin') {
       await supabase.auth.signOut();
-      setError('Access Denied. This portal is restricted to authorized administrators only.');
+      recordFailure();
       setLoading(false);
       return;
     }
 
+    // Reset on success
+    setFailedAttempts(0);
+    setLockoutUntil(null);
     router.push('/admin/dashboard');
     router.refresh();
   };
@@ -86,19 +113,17 @@ function AdminLoginForm() {
       </CardHeader>
 
       <CardContent className="p-8">
-        <form onSubmit={handleAdminLogin} className="space-y-5">
+        <form onSubmit={handleAdminLogin} className="space-y-5" autoComplete="off">
           <div className="space-y-2">
             <label className="text-sm font-bold text-slate-700">Administrator Email</label>
             <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={ADMIN_CONFIG.email}
+              placeholder="Enter your email"
+              autoComplete="off"
               required
             />
-            <p className="text-xs text-slate-500 mt-1">
-              Authorized admin email: {ADMIN_CONFIG.email}
-            </p>
           </div>
 
           <div className="space-y-2">
@@ -108,6 +133,7 @@ function AdminLoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
+              autoComplete="new-password"
               required
             />
           </div>
@@ -122,7 +148,7 @@ function AdminLoginForm() {
           <Button
             type="submit"
             className="w-full h-12 rounded-xl text-md font-bold bg-amber-600 hover:bg-amber-700 transition-all hover:shadow-lg"
-            disabled={loading}
+            disabled={loading || !!(lockoutUntil && Date.now() < lockoutUntil)}
           >
             <Lock size={16} className="mr-2" />
             {loading ? 'Verifying Credentials...' : 'Access Admin Console'}

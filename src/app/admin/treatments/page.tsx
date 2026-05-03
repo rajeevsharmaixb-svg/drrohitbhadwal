@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, Edit2, Trash2, Tag, Save, X } from "lucide-react";
+import { Plus, Edit2, Trash2, Tag, Save, X, Clock } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function AdminTreatmentsPage() {
@@ -34,6 +34,7 @@ export default function AdminTreatmentsPage() {
       category: editForm.category,
       is_active: editForm.is_active,
       sort_order: editForm.sort_order || 0,
+      duration_minutes: editForm.duration_minutes || 30,
     };
 
     if (id === "new") {
@@ -44,12 +45,17 @@ export default function AdminTreatmentsPage() {
       }
       toast.success("Treatment added");
     } else {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("treatments")
         .update(payload)
-        .eq("id", id as string);
+        .eq("id", id as string)
+        .select();
       if (error) {
         toast.error("Failed to update treatment");
+        return;
+      }
+      if (!data || data.length === 0) {
+        toast.error("Update failed — no rows affected. Check permissions.");
         return;
       }
       toast.success("Treatment updated");
@@ -76,7 +82,21 @@ export default function AdminTreatmentsPage() {
 
   const addNew = () => {
     setIsEditing("new");
-    setEditForm({ is_active: true, sort_order: treatments.length + 1 });
+    setEditForm({ is_active: true, sort_order: treatments.length + 1, duration_minutes: 30 });
+  };
+
+  // Shared input class for consistent Clinical White theme
+  const inputClass = "bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 focus:ring-1 focus:ring-primary outline-none";
+
+  // Helper to format duration for display
+  const formatDuration = (mins: number | null | undefined) => {
+    if (!mins) return null;
+    if (mins >= 60) {
+      const hrs = Math.floor(mins / 60);
+      const rem = mins % 60;
+      return rem > 0 ? `${hrs}h ${rem}m` : `${hrs} Hour${hrs > 1 ? 's' : ''}`;
+    }
+    return `${mins} min`;
   };
 
   return (
@@ -88,7 +108,7 @@ export default function AdminTreatmentsPage() {
             Treatments & Pricing
           </h1>
           <p className="text-slate-500 mt-2 font-medium">
-            Manage clinical procedures and standard price estimates
+            Manage clinical procedures, pricing, and treatment durations
           </p>
         </div>
         <button
@@ -108,7 +128,7 @@ export default function AdminTreatmentsPage() {
         ) : (
           <div className="space-y-4">
             {isEditing === "new" && (
-              <div className="bg-slate-800/50 p-6 rounded-2xl border border-primary/30 flex flex-col md:flex-row gap-4 items-start">
+              <div className="bg-blue-50/50 p-6 rounded-2xl border border-primary/30 flex flex-col md:flex-row gap-4 items-start">
                 <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                   <input
                     type="text"
@@ -117,7 +137,7 @@ export default function AdminTreatmentsPage() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, name: e.target.value })
                     }
-                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 focus:ring-1 focus:ring-primary outline-none"
+                    className={inputClass}
                   />
                   <input
                     type="text"
@@ -126,7 +146,7 @@ export default function AdminTreatmentsPage() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, category: e.target.value })
                     }
-                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 focus:ring-1 focus:ring-primary outline-none"
+                    className={inputClass}
                   />
                   <input
                     type="text"
@@ -135,8 +155,25 @@ export default function AdminTreatmentsPage() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, price_range: e.target.value })
                     }
-                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 focus:ring-1 focus:ring-primary outline-none"
+                    className={inputClass}
                   />
+                  <div className="relative">
+                    <label className="absolute -top-2 left-3 bg-slate-50 px-1 text-[10px] font-bold text-primary uppercase tracking-wider">Treatment Duration (min)</label>
+                    <input
+                      type="number"
+                      placeholder="e.g. 30, 60, 90"
+                      min="5"
+                      step="5"
+                      value={editForm.duration_minutes || ""}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          duration_minutes: parseInt(e.target.value) || 0,
+                        })
+                      }
+                      className={`${inputClass} pt-3`}
+                    />
+                  </div>
                   <input
                     type="number"
                     placeholder="Sort Order"
@@ -147,7 +184,7 @@ export default function AdminTreatmentsPage() {
                         sort_order: parseInt(e.target.value),
                       })
                     }
-                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 focus:ring-1 focus:ring-primary outline-none"
+                    className={inputClass}
                   />
                   <textarea
                     placeholder="Description"
@@ -155,19 +192,19 @@ export default function AdminTreatmentsPage() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, description: e.target.value })
                     }
-                    className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 focus:ring-1 focus:ring-primary outline-none md:col-span-2 h-20"
+                    className={`${inputClass} md:col-span-2 h-20`}
                   />
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleSave("new")}
-                    className="p-3 bg-emerald-500/20 text-emerald-400 rounded-xl hover:bg-emerald-500/30"
+                    className="p-3 bg-emerald-500/20 text-emerald-600 rounded-xl hover:bg-emerald-500/30"
                   >
                     <Save size={20} />
                   </button>
                   <button
                     onClick={() => setIsEditing(null)}
-                    className="p-3 bg-slate-700/50 text-slate-400 rounded-xl hover:bg-slate-700"
+                    className="p-3 bg-slate-100 text-slate-400 rounded-xl hover:bg-slate-200"
                   >
                     <X size={20} />
                   </button>
@@ -179,7 +216,7 @@ export default function AdminTreatmentsPage() {
               isEditing === t.id ? (
                 <div
                   key={t.id}
-                  className="bg-slate-800/50 p-6 rounded-2xl border border-primary/30 flex flex-col md:flex-row gap-4 items-start"
+                  className="bg-blue-50/50 p-6 rounded-2xl border border-primary/30 flex flex-col md:flex-row gap-4 items-start"
                 >
                   <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                     <input
@@ -189,7 +226,7 @@ export default function AdminTreatmentsPage() {
                       onChange={(e) =>
                         setEditForm({ ...editForm, name: e.target.value })
                       }
-                      className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 focus:ring-1 focus:ring-primary outline-none"
+                      className={inputClass}
                     />
                     <input
                       type="text"
@@ -198,7 +235,7 @@ export default function AdminTreatmentsPage() {
                       onChange={(e) =>
                         setEditForm({ ...editForm, category: e.target.value })
                       }
-                      className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                      className={inputClass}
                     />
                     <input
                       type="text"
@@ -210,8 +247,25 @@ export default function AdminTreatmentsPage() {
                           price_range: e.target.value,
                         })
                       }
-                      className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                      className={inputClass}
                     />
+                    <div className="relative">
+                      <label className="absolute -top-2 left-3 bg-slate-50 px-1 text-[10px] font-bold text-primary uppercase tracking-wider">Treatment Duration (min)</label>
+                      <input
+                        type="number"
+                        placeholder="e.g. 30, 60, 90"
+                        min="5"
+                        step="5"
+                        value={editForm.duration_minutes || ""}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm,
+                            duration_minutes: parseInt(e.target.value) || 0,
+                          })
+                        }
+                        className={`${inputClass} pt-3`}
+                      />
+                    </div>
                     <input
                       type="number"
                       placeholder="Sort Order"
@@ -222,7 +276,7 @@ export default function AdminTreatmentsPage() {
                           sort_order: parseInt(e.target.value),
                         })
                       }
-                      className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white"
+                      className={inputClass}
                     />
                     <textarea
                       placeholder="Description"
@@ -233,19 +287,19 @@ export default function AdminTreatmentsPage() {
                           description: e.target.value,
                         })
                       }
-                      className="bg-[#0B1B3D] border border-white/10 rounded-xl px-4 py-2 text-white md:col-span-2 h-20"
+                      className={`${inputClass} md:col-span-2 h-20`}
                     />
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleSave(t.id)}
-                      className="p-3 bg-emerald-500/20 text-emerald-400 rounded-xl hover:bg-emerald-500/30"
+                      className="p-3 bg-emerald-500/20 text-emerald-600 rounded-xl hover:bg-emerald-500/30"
                     >
                       <Save size={20} />
                     </button>
                     <button
                       onClick={() => setIsEditing(null)}
-                      className="p-3 bg-slate-700/50 text-slate-400 rounded-xl hover:bg-slate-700"
+                      className="p-3 bg-slate-100 text-slate-400 rounded-xl hover:bg-slate-200"
                     >
                       <X size={20} />
                     </button>
@@ -266,9 +320,17 @@ export default function AdminTreatmentsPage() {
                     <p className="text-sm text-slate-500 line-clamp-1 mb-2">
                       {t.description}
                     </p>
-                    <p className="text-emerald-500 font-bold">
-                      {t.price_range}
-                    </p>
+                    <div className="flex items-center gap-4">
+                      <p className="text-emerald-500 font-bold">
+                        {t.price_range}
+                      </p>
+                      {t.duration_minutes && (
+                        <span className="inline-flex items-center gap-1 text-sm font-semibold text-slate-500 bg-slate-50 px-2.5 py-1 rounded-lg">
+                          <Clock size={14} className="text-primary" />
+                          {formatDuration(t.duration_minutes)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button

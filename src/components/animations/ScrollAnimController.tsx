@@ -24,7 +24,7 @@ export default function ScrollAnimController() {
             const items = entry.target.querySelectorAll('.anim-item, .anim-icon, .anim-heading, .anim-card');
             items.forEach((el, i) => {
               const htmlEl = el as HTMLElement;
-              htmlEl.style.transitionDelay = `${Math.min(i * 100, 400)}ms`;
+              htmlEl.style.transitionDelay = `${Math.min(i * 25, 100)}ms`;
               htmlEl.classList.add('is-visible');
             });
           }

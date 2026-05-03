@@ -223,7 +223,7 @@ export default function AdminDashboardPage() {
                                 <Plus size={18} className="group-hover:rotate-90 transition-transform" />
                             </button>
                         </Link>
-                        <Link href="/admin/services">
+                        <Link href="/admin/treatments">
                             <button className="w-full h-12 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-between px-6 transition-all group border border-white/20">
                                 <span className="text-xs font-black uppercase tracking-widest">Update Catalog</span>
                                 <Briefcase size={18} />

@@ -42,7 +42,6 @@ export default function AdminLayout({
     { name: 'Overview', path: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Appointments', path: '/admin/appointments', icon: CalendarCheck },
     { name: 'Doctors', path: '/admin/doctors', icon: Stethoscope },
-    { name: 'Services', path: '/admin/services', icon: Briefcase },
     { name: 'Treatments', path: '/admin/treatments', icon: Tag },
     { name: 'Testimonials', path: '/admin/testimonials', icon: MessageSquare },
     { name: 'Site Settings', path: '/admin/settings', icon: Settings },
@@ -63,7 +62,7 @@ export default function AdminLayout({
     <div className="min-h-screen bg-slate-50 flex selection:bg-primary/10">
       {/* Mobile overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -78,11 +77,11 @@ export default function AdminLayout({
       `}>
         <div className="p-8 border-b border-white/5 flex items-center gap-3">
           <div className="rounded-xl overflow-hidden shadow-lg border-2 border-white/10 shrink-0">
-            <Image 
-              src="/images/logo.jpg" 
-              alt="Logo" 
-              width={36} 
-              height={36} 
+            <Image
+              src="/images/logo.jpg"
+              alt="Logo"
+              width={36}
+              height={36}
             />
           </div>
           <h1 className="text-xl font-black tracking-tight">Clinical Console</h1>
@@ -90,15 +89,14 @@ export default function AdminLayout({
 
         <nav className="flex-1 p-6 space-y-1">
           {navItems.map((item) => (
-            <Link 
-              key={item.path} 
+            <Link
+              key={item.path}
               href={item.path}
               onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all group ${
-                pathname === item.path 
+              className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all group ${pathname === item.path
                   ? 'bg-primary text-white shadow-lg shadow-primary/20'
                   : 'text-slate-400 hover:bg-slate-50 hover:text-primary'
-              }`}
+                }`}
             >
               <item.icon size={16} className={pathname === item.path ? 'text-white' : 'group-hover:text-primary transition-colors'} />
               {item.name}
@@ -111,7 +109,7 @@ export default function AdminLayout({
             <p className="text-[9px] uppercase font-black text-slate-400 tracking-widest mb-1">Authenticated Head</p>
             <p className="text-[10px] font-black text-slate-900 truncate">{user?.email}</p>
           </div>
-          <button 
+          <button
             onClick={handleLogout}
             className="flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-red-500 font-black text-[10px] uppercase tracking-widest hover:bg-red-50 transition-all border border-transparent hover:border-red-100"
           >
@@ -124,7 +122,7 @@ export default function AdminLayout({
       <div className="flex-1 lg:ml-64 min-h-screen">
         {/* Mobile top bar */}
         <div className="lg:hidden sticky top-0 bg-white border-b border-slate-100 z-30 px-6 py-4 flex items-center justify-between shadow-sm">
-          <button 
+          <button
             onClick={() => setSidebarOpen(true)}
             className="p-2 rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100"
           >
