@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { LayoutDashboard, Users, Stethoscope, Briefcase, Settings, LogOut, ShieldCheck, CalendarCheck, Menu, X, MessageSquare, Tag } from 'lucide-react';
+import { LayoutDashboard, Users, Stethoscope, Briefcase, Settings, LogOut, ShieldCheck, CalendarCheck, Menu, X, MessageSquare, Tag, Clock } from 'lucide-react';
 
 export default function AdminLayout({
   children,
@@ -43,6 +43,7 @@ export default function AdminLayout({
     { name: 'Appointments', path: '/admin/appointments', icon: CalendarCheck },
     { name: 'Doctors', path: '/admin/doctors', icon: Stethoscope },
     { name: 'Treatments', path: '/admin/treatments', icon: Tag },
+    { name: 'Slots', path: '/admin/slots', icon: Clock },
     { name: 'Testimonials', path: '/admin/testimonials', icon: MessageSquare },
     { name: 'Site Settings', path: '/admin/settings', icon: Settings },
   ];
